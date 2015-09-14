@@ -1,0 +1,5 @@
+<testsuites>
+	<testsuite name="CPUsimTest" tests="1">
+		<testcase classname="CPUsimTest" name="canIncrementInt"/>
+	</testsuite>
+</testsuites>
