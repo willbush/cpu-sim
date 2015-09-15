@@ -7,27 +7,23 @@
 #include <unistd.h>
 #include <iostream>
 
-int intAfterPipe;
-
-ComputerSim::ComputerSim(const int value) {
-    int myValue = value;
+ComputerSim::ComputerSim(const int* program) {
     int cpuToMem[2];
     int memToCpu[2];
     tryPipe(cpuToMem, memToCpu);
     int forkResult = tryFork();
 
     if (isChild(forkResult)) {
-        int& cpuReader = cpuToMem[0];
-        int& cpuWriter = memToCpu[1];
-        Memory m(cpuReader, cpuWriter);
+        int& cpuReadEnd = cpuToMem[0];
+        int& cpuWriteEnd = memToCpu[1];
+        Memory m(cpuReadEnd, cpuWriteEnd, program);
         _exit(EXIT_SUCCESS);
     } else if (isParent(forkResult)) {
-        int size = sizeof(value);
-        write(cpuToMem[1], &myValue, size);
-        read(memToCpu[0], &myValue, size);
-        intAfterPipe = myValue;
+        int& memWriteEnd = cpuToMem[1];
+        int& memReadEnd = memToCpu[0];
+        Cpu c(memReadEnd, memWriteEnd);
+        waitpid(-1, NULL, 0); // wait for child
     }
-    waitpid(-1, NULL, 0);
 }
 
 ComputerSim::~ComputerSim() {
@@ -57,8 +53,4 @@ bool ComputerSim::isChild(int forkResult) const {
 
 bool ComputerSim::isParent(int forkResult) const {
     return forkResult > 0;
-}
-
-int ComputerSim::getIntAfterPipe() const {
-    return intAfterPipe;
 }

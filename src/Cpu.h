@@ -3,8 +3,11 @@
 
 class Cpu {
 public:
-    Cpu(const int*, const int*);
+    Cpu(const int&, const int&);
     virtual ~Cpu();
+    int getAC() const;
+private:
+    int ac;
 };
 
 #endif

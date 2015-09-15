@@ -4,15 +4,10 @@
 
 class ComputerSim {
 public:
-    ComputerSim(const int);
-
+    ComputerSim(const int* program);
     virtual ~ComputerSim();
 
-    int getIntAfterPipe() const;
-
 private:
-    int intAfterPipe;
-
     bool isChild(int) const;
     bool isParent(int) const;
     void tryPipe(int*, int*) const;
