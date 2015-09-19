@@ -10,6 +10,3 @@ cute::suite make_suite_CPUsimTest(){
 	s.push_back(CUTE(thisIsACPUsimTestTest));
 	return s;
 }
-
-
-

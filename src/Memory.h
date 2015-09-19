@@ -1,24 +1,26 @@
 #ifndef SRC_MEMORY_H_
 #define SRC_MEMORY_H_
+#include <vector>
 
 class Memory {
 public:
-    Memory(const int&, const int&, const int* program);
+    Memory(const int&, const int&, const std::vector<int>&);
     virtual ~Memory();
 
 private:
     static const int SPACE_AVAILABLE = 2000;
-    const int &CPU_READ_END, &CPU_WRITE_END;
+    const int &READ_END_OF_PIPE, &WRITE_END_OF_PIPE;
     int memory[SPACE_AVAILABLE];
-    void initializeMemory(const int*);
-    int readFromMemory() const;
+    void initializeMemory(const std::vector<int>&);
     void writeToMemory();
     void listenForCpuCommands();
     void performCommand(char);
+    void sendReadySignal() const;
+    int readFromMemory() const;
     void sendToCpu(int) const;
-    bool cpuHasCommands(int command) const;
-    bool isReadCommand(char command) const;
-    bool isWriteCommand(char command) const;
+    bool cpuHasCommands(int) const;
+    bool isReadCommand(char) const;
+    bool isWriteCommand(char) const;
 };
 
-#endif
+#endif // SRC_MEMORY_H_

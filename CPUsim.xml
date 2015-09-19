@@ -1,5 +1,19 @@
 <testsuites>
-	<testsuite name="CPUsimTest" tests="1">
-		<testcase classname="CPUsimTest" name="canLoad7intoAC"/>
+	<testsuite name="CPUsimTest" tests="15">
+		<testcase classname="CPUsimTest" name="CpuSimTest::canLoadValueIntoAC"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canLoadValueIntoAcFromAddress"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canStoreIntoAddressAndLoadFromAddress"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canIncrementandDecrementX"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canLoadValueFromAddressPlusXintoAC"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canLoadValueFromAddressPlusYintoAC"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canCopyToX"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canCopyToY"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canCopyXtoAC"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canCopyYtoAC"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canJumpToAddress"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canJumpToAddressIfAcIsZero"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canJumpToAddressIfAcIsNotZero"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canPutPortOne"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canPutPortTwo"/>
 	</testsuite>
 </testsuites>

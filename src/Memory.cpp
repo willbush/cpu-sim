@@ -1,27 +1,32 @@
 #include "Memory.h"
 #include <unistd.h>
 
-Memory::Memory(const int& cpuReadEnd, const int& cpuWriteEnd,
-        const int* program)
-        : CPU_READ_END(cpuReadEnd), CPU_WRITE_END(cpuWriteEnd) {
+Memory::Memory(const int& readEndOfPipe, const int& writeEndOfPipe,
+        const std::vector<int>& program)
+        : READ_END_OF_PIPE(readEndOfPipe), WRITE_END_OF_PIPE(writeEndOfPipe) {
+
     initializeMemory(program);
+    sendReadySignal();
     listenForCpuCommands();
 }
 
 Memory::~Memory() {
 }
 
-void Memory::initializeMemory(const int* program) {
-    const int programLen = sizeof(program) / sizeof(program[0]);
-
-    for (int i = 0; i < programLen; i++)
+void Memory::initializeMemory(const std::vector<int>& program) {
+    for (unsigned int i = 0; i < program.size(); i++)
         memory[i] = program[i];
 }
 
+void Memory::sendReadySignal() const {
+    const char readySignal = 'r';
+    write(WRITE_END_OF_PIPE, &readySignal, sizeof(readySignal));
+}
+
 void Memory::listenForCpuCommands() {
-    int command;
+    char command;
     do {
-        read(CPU_READ_END, &command, sizeof(char));
+        read(READ_END_OF_PIPE, &command, sizeof(char));
         performCommand(command);
     } while (cpuHasCommands(command));
 }
@@ -43,18 +48,18 @@ bool Memory::isWriteCommand(char command) const {
 
 int Memory::readFromMemory() const {
     int address;
-    read(CPU_READ_END, &address, sizeof(int));
+    read(READ_END_OF_PIPE, &address, sizeof(int));
     return memory[address];
 }
 
 void Memory::sendToCpu(int valueFromMem) const {
-    write(CPU_WRITE_END, &valueFromMem, sizeof(valueFromMem));
+    write(WRITE_END_OF_PIPE, &valueFromMem, sizeof(valueFromMem));
 }
 
 void Memory::writeToMemory() {
     int address, valueToWrite, size = sizeof(int);
-    read(CPU_READ_END, &address, size);
-    read(CPU_READ_END, &valueToWrite, size);
+    read(READ_END_OF_PIPE, &address, size);
+    read(READ_END_OF_PIPE, &valueToWrite, size);
     memory[address] = valueToWrite;
 }
 

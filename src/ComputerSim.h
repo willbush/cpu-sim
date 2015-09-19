@@ -4,7 +4,7 @@
 
 class ComputerSim {
 public:
-    ComputerSim(const int* program);
+    ComputerSim(const int*);
     virtual ~ComputerSim();
 
 private:
@@ -12,7 +12,7 @@ private:
     bool isParent(int) const;
     void tryPipe(int*, int*) const;
     int tryFork() const;
-    void printThenExitFailure(const std::string) const;
+    void printErrThenExitFailure(const std::string) const;
 };
 
-#endif
+#endif // SRC_COMPUTERSIM_H_

@@ -16,7 +16,7 @@ ComputerSim::ComputerSim(const int* program) {
     if (isChild(forkResult)) {
         int& cpuReadEnd = cpuToMem[0];
         int& cpuWriteEnd = memToCpu[1];
-        Memory m(cpuReadEnd, cpuWriteEnd, program);
+//        Memory m(cpuReadEnd, cpuWriteEnd, program); //TODO fix programLen
         _exit(EXIT_SUCCESS);
     } else if (isParent(forkResult)) {
         int& memWriteEnd = cpuToMem[1];
@@ -31,18 +31,18 @@ ComputerSim::~ComputerSim() {
 
 void ComputerSim::tryPipe(int* cpuToMem, int* memToCpu) const {
     if (pipe(cpuToMem) < 0 || pipe(memToCpu) < 0)
-        printThenExitFailure("pipe failed");
+        printErrThenExitFailure("pipe failed");
 }
 
 int ComputerSim::tryFork() const {
     int forkResult = fork();
     if (forkResult == -1)
-        printThenExitFailure("fork failed");
+        printErrThenExitFailure("fork failed");
 
     return forkResult;
 }
 
-void ComputerSim::printThenExitFailure(const std::string errorMsg) const {
+void ComputerSim::printErrThenExitFailure(const std::string errorMsg) const {
     std::cerr << errorMsg << std::endl;
     exit(EXIT_FAILURE);
 }
