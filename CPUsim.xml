@@ -1,5 +1,5 @@
 <testsuites>
-	<testsuite name="CPUsimTest" tests="15">
+	<testsuite name="CPUsimTest" tests="24">
 		<testcase classname="CPUsimTest" name="CpuSimTest::canLoadValueIntoAC"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canLoadValueIntoAcFromAddress"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canStoreIntoAddressAndLoadFromAddress"/>
@@ -15,5 +15,14 @@
 		<testcase classname="CPUsimTest" name="CpuSimTest::canJumpToAddressIfAcIsNotZero"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canPutPortOne"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canPutPortTwo"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canPush"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canPushAndPop"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canPutRandInAC"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canAddXtoAC"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canAddYtoAC"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canAddTwoRandAndPrint"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canCallAddress"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canReturnFromStack"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canPrintHi"/>
 	</testsuite>
 </testsuites>

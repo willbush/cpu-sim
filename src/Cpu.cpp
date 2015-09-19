@@ -7,7 +7,8 @@
 
 Cpu::Cpu(const int& readEndOfPipe, const int& writeEndOfPipe)
         : READ_END_OF_PIPE(readEndOfPipe), WRITE_END_OF_PIPE(writeEndOfPipe) {
-    pc = ac = x = y = 0;
+    ir = pc = ac = x = y = 0;
+    sp = STACK_START_ADDRESS;
     cpuEvents = "";
 
     waitForMemReadySignal();
@@ -30,14 +31,13 @@ void Cpu::waitForMemReadySignal() {
 }
 
 void Cpu::runProcessor() {
-    int ir;
     do {
         ir = fetchInstruction();
-        processInstruction(ir);
-    } while (endNotReached(ir));
+        processInstruction();
+    } while (endNotReached());
 }
 
-void Cpu::processInstruction(const int ir) {
+void Cpu::processInstruction() {
     switch (ir) {
     case 1:
         loadValue();
@@ -57,8 +57,17 @@ void Cpu::processInstruction(const int ir) {
     case 7:
         storeAddress();
         break;
+    case 8:
+        putRandInAC();
+        break;
     case 9:
         putPort();
+        break;
+    case 10:
+        addXtoAC();
+        break;
+    case 11:
+        addYtoAC();
         break;
     case 14:
         copyACtoX();
@@ -73,19 +82,25 @@ void Cpu::processInstruction(const int ir) {
         copyYtoAC();
         break;
     case 20:
-        jumpToAddress();
+        jumpToAddress(fetchInstruction());
         break;
     case 21:
         if (ac == 0)
-            jumpToAddress();
+            jumpToAddress(fetchInstruction());
         else
             pc++;
         break;
     case 22:
         if (ac != 0)
-            jumpToAddress();
+            jumpToAddress(fetchInstruction());
         else
             pc++;
+        break;
+    case 23:
+        callAddress();
+        break;
+    case 24:
+        returnFromStack();
         break;
     case 25:
         cpuEvents += "x++ ";
@@ -94,6 +109,12 @@ void Cpu::processInstruction(const int ir) {
     case 26:
         x--;
         cpuEvents += "x-- ";
+        break;
+    case 27:
+        push(ac);
+        break;
+    case 28:
+        ac = pop();
         break;
     }
 }
@@ -118,8 +139,8 @@ void Cpu::writeToMemory(const int address, const int value) {
     write(WRITE_END_OF_PIPE, &value, sizeof(int)); // tell memory the value
 }
 
-bool Cpu::endNotReached(int instruction) const {
-    return instruction != END_INSTRUCTION;
+bool Cpu::endNotReached() const {
+    return ir != END_INSTRUCTION;
 }
 
 bool Cpu::isReadySignal(char command) const {
@@ -219,8 +240,8 @@ void Cpu::copyYtoAC() {
     cpuEvents += oss.str();
 }
 
-void Cpu::jumpToAddress() {
-    pc = fetchInstruction();
+void Cpu::jumpToAddress(const int address) {
+    pc = address;
     std::ostringstream oss;
     oss << "JA" << pc << " ";
     cpuEvents += oss.str();
@@ -238,4 +259,56 @@ void Cpu::putPort() {
         oss << "P2," << value << " ";
     }
     cpuEvents += oss.str();
+}
+
+void Cpu::callAddress() {
+    const int address = fetchInstruction();
+    push(pc);
+    jumpToAddress(address);
+    std::ostringstream oss;
+    oss << "CA" << address << " ";
+    cpuEvents += oss.str();
+}
+
+void Cpu::returnFromStack() {
+    const int address = pop();
+    jumpToAddress(address);
+    std::ostringstream oss;
+    oss << "RET" << address << " ";
+    cpuEvents += oss.str();
+}
+
+void Cpu::push(const int value) {
+    writeToMemory(--sp, value);
+    std::ostringstream oss;
+    oss << "PU" << sp << "," << value << " ";
+    cpuEvents += oss.str();
+}
+
+int Cpu::pop() {
+    const int spCopy = sp;
+    const int poppedValue = readFromMemory(sp++);
+    std::ostringstream oos;
+    oos << "PO" << spCopy << "," << poppedValue << " ";
+    cpuEvents += oos.str();
+    return poppedValue;
+}
+
+void Cpu::putRandInAC() {
+    ac = rand() % 100 + 1; // random integer on interval [1, 100]
+    cpuEvents += "R ";
+}
+
+void Cpu::addXtoAC() {
+    std::ostringstream oos;
+    oos << "AX2AC" << x << "," << ac << " ";
+    cpuEvents += oos.str();
+    ac = ac + x;
+}
+
+void Cpu::addYtoAC() {
+    std::ostringstream oos;
+    oos << "AY2AC" << y << "," << ac << " ";
+    cpuEvents += oos.str();
+    ac = ac + y;
 }

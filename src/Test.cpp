@@ -116,6 +116,61 @@ struct CpuSimTest {
         assertCpuEventsEqual("w LV1101 P2,M e", createVector(instructions, len));
     }
 
+    void canPush() {
+        const int len = 7;
+        int instructions[len] = { 1, 9, 27, 1, 10, 27, 50 };
+        assertCpuEventsEqual("w LV9 PU998,9 LV10 PU997,10 e", createVector(instructions, len));
+    }
+
+    void canPushAndPop() {
+        const int len = 9;
+        int instructions[len] = { 1, 9, 27, 1, 10, 27, 28, 28, 50 };
+        assertCpuEventsEqual("w LV9 PU998,9 LV10 PU997,10 PO997,10 PO998,9 e", createVector(instructions, len));
+    }
+
+    void canPutRandInAC() {
+        const int len = 2;
+        int instructions[len] = { 8, 50 };
+        assertCpuEventsEqual("w R e", createVector(instructions, len));
+    }
+
+    void canAddXtoAC() {
+        const int len = 5;
+        int instructions[len] = { 1, 4, 25, 10, 50 };
+        assertCpuEventsEqual("w LV4 x++ AX2AC1,4 e", createVector(instructions, len));
+    }
+
+    void canAddYtoAC() {
+        const int len = 5;
+        int instructions[len] = { 1, 4, 16, 11, 50 };
+        assertCpuEventsEqual("w LV4 CY4 AY2AC4,4 e", createVector(instructions, len));
+    }
+
+    void canAddTwoRandAndPrint() {
+        const int len = 10;
+        int instructions[len] = { 8, 14, 8, 16, 8, 10, 11, 9, 1, 50 };
+        assertCpuEventsEqual("w R CX87 R CY78 R AX2AC87,16 AY2AC78,103 P1,181 e", createVector(instructions, len));
+    }
+
+    void canCallAddress() {
+        const int len = 10;
+        int instructions[len] = { 23, 2, 50 };
+        assertCpuEventsEqual("w PU998,2 JA2 CA2 e", createVector(instructions, len));
+    }
+
+    void canReturnFromStack() {
+        const int len = 6;
+        int instructions[len] = { 23, 3, 50, 25, 25, 24 };
+        assertCpuEventsEqual("w PU998,2 JA3 CA3 x++ x++ PO998,2 JA2 RET2 e", createVector(instructions, len));
+    }
+
+    void canPrintHi() {
+        const int len = 16;
+        int instructions[len] = { 1, 72, 9, 2, 1, 73, 9, 2, 23, 11, 50, 1, 10, 9, 2, 24 };
+        assertCpuEventsEqual("w LV72 P2,H LV73 P2,I PU998,10 JA11 CA11 LV10 P2,\n PO998,10 JA10 RET10 e",
+                createVector(instructions, len));
+    }
+
 private:
     std::vector<int> createVector(int array[], const int len) {
         std::vector<int> v(&array[0], &array[0] + len);
@@ -153,6 +208,15 @@ void runSuite(int argc, char const *argv[]) {
     s.push_back(CUTE_SMEMFUN(CpuSimTest, canJumpToAddressIfAcIsNotZero));
     s.push_back(CUTE_SMEMFUN(CpuSimTest, canPutPortOne));
     s.push_back(CUTE_SMEMFUN(CpuSimTest, canPutPortTwo));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canPush));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canPushAndPop));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canPutRandInAC));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canAddXtoAC));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canAddYtoAC));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canAddTwoRandAndPrint));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canCallAddress));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canReturnFromStack));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canPrintHi));
 
     cute::makeRunner(lis, argc, argv)(s, "CPUsimTest");
 }
