@@ -4,19 +4,18 @@
 #include "ide_listener.h"
 #include "xml_listener.h"
 #include "cute_runner.h"
-#include "CPUsimTest.h"
 #include "sys/wait.h"
 
 struct CpuSimTest {
-    int forkResult;
-    int cpuToMem[2];
-    int memToCpu[2];
+    int _forkResult;
+    int _cpuToMem[2];
+    int _memToCpu[2];
 
     // serves as the test setup
     CpuSimTest() {
-        pipe(cpuToMem);
-        pipe(memToCpu);
-        forkResult = fork();
+        pipe(_cpuToMem);
+        pipe(_memToCpu);
+        _forkResult = fork();
     }
 
     // serves as the test tear down.
@@ -223,11 +222,11 @@ private:
     }
 
     void assertCpuEventsEqual(const std::string& expected, const std::vector<int>& program) {
-        if (forkResult == 0) {
-            Memory m(cpuToMem[0], memToCpu[1], program);
+        if (_forkResult == 0) {
+            Memory m(_cpuToMem[0], _memToCpu[1], program);
             _exit(EXIT_SUCCESS);
         } else {
-            Cpu c(memToCpu[0], cpuToMem[1], 10);
+            Cpu c(_memToCpu[0], _cpuToMem[1], 10);
             ASSERT_EQUAL(expected, c.getEvents());
             waitpid(-1, NULL, 0); // wait for child
         }
