@@ -1,5 +1,6 @@
 #include "cute.h"
 #include "Memory.h"
+#include "Parser.h"
 #include "Cpu.h"
 #include "ide_listener.h"
 #include "xml_listener.h"
@@ -233,6 +234,42 @@ private:
     }
 };
 
+struct ParserTest {
+    ParserTest() {
+    }
+
+    ~ParserTest() {
+    }
+
+    void canIgnoreWhitespace() {
+        int value = -1;
+        int result = Parser::tryPraseLine(" \n", value);
+        ASSERT_EQUAL(false, result);
+        ASSERT_EQUAL(-1, value);
+    }
+
+    void canIgnoreOnlyCommet() {
+        int value = -1;
+        int result = Parser::tryPraseLine("// 10 useful comment\n", value);
+        ASSERT_EQUAL(false, result);
+        ASSERT_EQUAL(-1, value);
+    }
+
+    void canIgnoreCommet() {
+        int value;
+        int result = Parser::tryPraseLine("23 //useful comment\n", value);
+        ASSERT_EQUAL(true, result);
+        ASSERT_EQUAL(23, value);
+    }
+
+    void canParseLoadAddress() {
+        int value;
+        int result = Parser::tryPraseLine(".1000 //useful comment\n", value);
+        ASSERT_EQUAL(true, result);
+        ASSERT_EQUAL(-1000, value);
+    }
+};
+
 void runSuite(int argc, char const *argv[]) {
     cute::xml_file_opener xmlfile(argc, argv);
     cute::xml_listener<cute::ide_listener<> > lis(xmlfile.out);
@@ -268,6 +305,11 @@ void runSuite(int argc, char const *argv[]) {
     s.push_back(CUTE_SMEMFUN(CpuSimTest, canInterruptAndReturn));
     s.push_back(CUTE_SMEMFUN(CpuSimTest, canLoadFromSPplusX));
     s.push_back(CUTE_SMEMFUN(CpuSimTest, canPreventRecursiveInterrupts));
+
+	s.push_back(CUTE_SMEMFUN(ParserTest, canIgnoreWhitespace));
+	s.push_back(CUTE_SMEMFUN(ParserTest, canIgnoreCommet));
+	s.push_back(CUTE_SMEMFUN(ParserTest, canParseLoadAddress));
+	s.push_back(CUTE_SMEMFUN(ParserTest, canIgnoreOnlyCommet));
 
     cute::makeRunner(lis, argc, argv)(s, "CPUsimTest");
 }
