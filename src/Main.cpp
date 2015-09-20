@@ -10,25 +10,26 @@ using namespace std;
 
 bool isCorrectArgCount(int);
 int tryParseTimer(const string&);
-vector<int> parseSourceFile(fstream&, const string&);
+vector<int> parseSourceFile(const string&);
+bool fileExist(const std::string&);
 
-//int main(int argc, char const *argv[]) {
-//    if (!isCorrectArgCount(argc))
-//        exit(EXIT_FAILURE);
-//
-//    const string filepath = argv[1];
-//    const string intervalTimerStr = argv[2];
-//    const int intervaltimer = tryParseTimer(intervalTimerStr);
-//
-//    fstream fs(filepath.c_str());
-//    if (!fs) {
-//        cerr << "source file: " << filepath << " not found\n";
-//        exit(EXIT_FAILURE);
-//    }
-//    vector<int> program = parseSourceFile(fs, filepath);
-//
-//    ComputerSim c(program, intervaltimer);
-//}
+int main(int argc, char const *argv[]) {
+    if (!isCorrectArgCount(argc))
+        exit(EXIT_FAILURE);
+
+    const string filepath = argv[1];
+    const string intervalTimerStr = argv[2];
+    const int intervaltimer = tryParseTimer(intervalTimerStr);
+
+    if (!fileExist(filepath)) {
+        cerr << "source file: " << filepath << " not found\n";
+        exit(EXIT_FAILURE);
+    }
+
+    vector<int> program = parseSourceFile(filepath);
+
+    ComputerSim c(program, intervaltimer);
+}
 
 bool isCorrectArgCount(int argc) {
     const int requiredArgs = 3;
@@ -52,12 +53,17 @@ int tryParseTimer(const string& intervalTimerStr) {
     return intervalTimer;
 }
 
-vector<int> parseSourceFile(fstream& sourceFile, const string& path) {
+bool fileExist(const std::string& path) {
+    return ifstream(path.c_str());
+}
+
+vector<int> parseSourceFile(const string& path) {
+    fstream sourceFile;
     vector<int> program;
     sourceFile.open(path.c_str(), ios::in);
     string line;
 
-    while(getline(sourceFile, line)) {
+    while (getline(sourceFile, line)) {
         int codeInput;
         if (Parser::tryPraseLine(line, codeInput))
             program.push_back(codeInput);

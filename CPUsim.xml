@@ -31,7 +31,7 @@
 		<testcase classname="CPUsimTest" name="CpuSimTest::canInterruptAndReturn"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canLoadFromSPplusX"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canPreventRecursiveInterrupts"/>
-		<testcase classname="CPUsimTest" name="CpuSimTest::acceptanceTestOne"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::acceptanceTest"/>
 		<testcase classname="CPUsimTest" name="ParserTest::canIgnoreWhitespace"/>
 		<testcase classname="CPUsimTest" name="ParserTest::canIgnoreCommet"/>
 		<testcase classname="CPUsimTest" name="ParserTest::canParseLoadAddress"/>
