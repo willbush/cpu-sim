@@ -16,7 +16,7 @@ private:
     static const int TIMER_INTERRUPT_HANDLER_ADDRESS = 1000;
     static const int INTERRUPT_HANDLER_ADDRESS = 1500;
     static const int END_INSTRUCTION = 50;
-    int _ir, _pc, _ac, _x, _y, _sp;
+    unsigned int _ir, _pc, _ac, _x, _y, _sp;
     unsigned int _interruptInterval;
     const int &READ_END_OF_PIPE, &WRITE_END_OF_PIPE;
     bool _inSystemMode, _interruptEnabled;

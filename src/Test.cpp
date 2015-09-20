@@ -88,19 +88,19 @@ struct CpuSimTest {
     void canJumpToAddress() {
         const int len = 8;
         // jump pass garbage -1 to the end (50)
-        int instructions[len] = { 20, 5, -1, -1, -1, 50, -1000, 30 };
+        int instructions[len] = { 20, 5, 99, 99, 99, 50, -1000, 30 };
         assertCpuEventsEqual("w JA5 e", createVector(instructions, len));
     }
 
     void canJumpToAddressIfAcIsZero() {
         const int len = 14;
-        int instructions[len] = { 1, 1, 21, 5, 1, 0, 21, 11, -1, -1, -1, 50, -1000, 30 };
+        int instructions[len] = { 1, 1, 21, 5, 1, 0, 21, 11, 99, 99, 99, 50, -1000, 30 };
         assertCpuEventsEqual("w LV1 LV0 JA11 e", createVector(instructions, len));
     }
 
     void canJumpToAddressIfAcIsNotZero() {
         const int len = 14;
-        int instructions[len] = { 1, 0, 22, 5, 1, 1, 22, 11, -1, -1, -1, 50, -1000, 30 };
+        int instructions[len] = { 1, 0, 22, 5, 1, 1, 22, 11, 99, 99, 99, 50, -1000, 30 };
         assertCpuEventsEqual("w LV0 LV1 JA11 e", createVector(instructions, len));
     }
 
@@ -211,9 +211,9 @@ struct CpuSimTest {
     }
 
     void canLoadFromSPplusX() {
-        const int len = 7;
-        int instructions[len] = { 1, -999, 14, 6, 50, -1000, 30 };
-        assertCpuEventsEqual("w LV-999 CX-999 LSP+X0,1 e", createVector(instructions, len));
+        const int len = 11;
+        int instructions[len] = { 1, 7, 27, 1, 5, 27, 25, 6, 50, -1000, 30 };
+        assertCpuEventsEqual("w LV7 PU998,7 LV5 PU997,5 x++ LSP+X998,7 e", createVector(instructions, len));
     }
 
     // should print out ABCDEFGHIJKLMNOPQRSTUVWXYZ12345678910

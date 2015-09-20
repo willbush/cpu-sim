@@ -19,11 +19,8 @@ void Memory::initializeMemory(const std::vector<int>& program) {
 
     while (programIndex < program.size()) {
         int value = program[programIndex];
-        if (value == -TIMER_INTERRUPT_HANDLER_START_ADDRESS) {
-            memIndex = TIMER_INTERRUPT_HANDLER_START_ADDRESS;
-            programIndex++; // move to next instruction
-        } else if (value == -INTERRUPT_HANDLER_START_ADDRESS) {
-            memIndex = INTERRUPT_HANDLER_START_ADDRESS;
+        if (value < 0) { // negative numbers represent a load address
+            memIndex = -value; // index is the positive value
             programIndex++; // move to next instruction
         }
         memory[memIndex++] = program[programIndex++];
