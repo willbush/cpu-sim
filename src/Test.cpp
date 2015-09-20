@@ -216,6 +216,36 @@ struct CpuSimTest {
         assertCpuEventsEqual("w LV-999 CX-999 LSP+X0,1 e", createVector(instructions, len));
     }
 
+    // should print out ABCDEFGHIJKLMNOPQRSTUVWXYZ12345678910
+    void acceptanceTest() {
+        const int len = 1000;
+        int instructions[len] = { 1, 0, 14, 4, 32, 21, 12, 9, 2, 25, 20, 3, 1, 0, 16, 5, 59, 21, 27, 9, 1, 1, 1, 11, 16,
+                20, 15, 1, 10, 9, 2, 50, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84,
+                85, 86, 87, 88, 89, 90, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0, -1000, 30 };
+        std::string exptected = "w LV0 CX0 LVFAPX32,65 P2,A x++ JA3 LVFAPX33,66 P2,B x++ PU998,10 PU1998,998 SM,1 "
+                "PO1998,998 PO998,10 SM,0 JA3 LVFAPX34,67 P2,C x++ JA3 LVFAPX35,68 P2,D x++ PU998,10 PU1998,998 "
+                "SM,1 PO1998,998 PO998,10 SM,0 JA3 LVFAPX36,69 P2,E x++ JA3 LVFAPX37,70 P2,F x++ PU998,10 PU1998,998 "
+                "SM,1 PO1998,998 PO998,10 SM,0 JA3 LVFAPX38,71 P2,G x++ JA3 LVFAPX39,72 P2,H x++ PU998,10 PU1998,998 "
+                "SM,1 PO1998,998 PO998,10 SM,0 JA3 LVFAPX40,73 P2,I x++ JA3 LVFAPX41,74 P2,J x++ PU998,10 PU1998,998 "
+                "SM,1 PO1998,998 PO998,10 SM,0 JA3 LVFAPX42,75 P2,K x++ JA3 LVFAPX43,76 P2,L x++ PU998,10 PU1998,998 "
+                "SM,1 PO1998,998 PO998,10 SM,0 JA3 LVFAPX44,77 P2,M x++ JA3 LVFAPX45,78 P2,N x++ PU998,10 PU1998,998 "
+                "SM,1 PO1998,998 PO998,10 SM,0 JA3 LVFAPX46,79 P2,O x++ JA3 LVFAPX47,80 P2,P x++ PU998,10 PU1998,998 "
+                "SM,1 PO1998,998 PO998,10 SM,0 JA3 LVFAPX48,81 P2,Q x++ JA3 LVFAPX49,82 P2,R x++ PU998,10 PU1998,998 "
+                "SM,1 PO1998,998 PO998,10 SM,0 JA3 LVFAPX50,83 P2,S x++ JA3 LVFAPX51,84 P2,T x++ PU998,10 PU1998,998 "
+                "SM,1 PO1998,998 PO998,10 SM,0 JA3 LVFAPX52,85 P2,U x++ JA3 LVFAPX53,86 P2,V x++ PU998,10 PU1998,998 "
+                "SM,1 PO1998,998 PO998,10 SM,0 JA3 LVFAPX54,87 P2,W x++ JA3 LVFAPX55,88 P2,X x++ PU998,10 PU1998,998 "
+                "SM,1 PO1998,998 PO998,10 SM,0 JA3 LVFAPX56,89 P2,Y x++ JA3 LVFAPX57,90 P2,Z x++ PU998,10 PU1998,998 "
+                "SM,1 PO1998,998 PO998,10 SM,0 JA3 LVFAPX58,0 JA12 LV0 CY0 LVFAPY59,1 P1,1 LV1 AY2AC0,1 PU998,24 PU1998,998 "
+                "SM,1 PO1998,998 PO998,24 SM,0 CY1 JA15 LVFAPY60,2 P1,2 LV1 AY2AC1,1 CY2 JA15 LVFAPY61,3 PU998,17 PU1998,998 "
+                "SM,1 PO1998,998 PO998,17 SM,0 P1,3 LV1 AY2AC2,1 CY3 JA15 LVFAPY62,4 P1,4 LV1 PU998,23 PU1998,998 SM,1 "
+                "PO1998,998 PO998,23 SM,0 AY2AC3,1 CY4 JA15 LVFAPY63,5 P1,5 LV1 AY2AC4,1 CY5 JA15 PU998,15 PU1998,998 "
+                "SM,1 PO1998,998 PO998,15 SM,0 LVFAPY64,6 P1,6 LV1 AY2AC5,1 CY6 JA15 LVFAPY65,7 P1,7 PU998,21 PU1998,998 "
+                "SM,1 PO1998,998 PO998,21 SM,0 LV1 AY2AC6,1 CY7 JA15 LVFAPY66,8 P1,8 LV1 AY2AC7,1 CY8 PU998,25 PU1998,998 "
+                "SM,1 PO1998,998 PO998,25 SM,0 JA15 LVFAPY67,9 P1,9 LV1 AY2AC8,1 CY9 JA15 LVFAPY68,10 PU998,19 PU1998,998 "
+                "SM,1 PO1998,998 PO998,19 SM,0 P1,10 LV1 AY2AC9,1 CY10 JA15 LVFAPY69,0 JA27 LV10 P2,\n PU998,32 PU1998,998 SM,1 e";
+        assertCpuEventsEqual(exptected, createVector(instructions, len));
+    }
+
 private:
     std::vector<int> createVector(int array[], const int len) {
         std::vector<int> v(&array[0], &array[0] + len);
@@ -305,11 +335,12 @@ void runSuite(int argc, char const *argv[]) {
     s.push_back(CUTE_SMEMFUN(CpuSimTest, canInterruptAndReturn));
     s.push_back(CUTE_SMEMFUN(CpuSimTest, canLoadFromSPplusX));
     s.push_back(CUTE_SMEMFUN(CpuSimTest, canPreventRecursiveInterrupts));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, acceptanceTest));
 
-	s.push_back(CUTE_SMEMFUN(ParserTest, canIgnoreWhitespace));
-	s.push_back(CUTE_SMEMFUN(ParserTest, canIgnoreCommet));
-	s.push_back(CUTE_SMEMFUN(ParserTest, canParseLoadAddress));
-	s.push_back(CUTE_SMEMFUN(ParserTest, canIgnoreOnlyCommet));
+    s.push_back(CUTE_SMEMFUN(ParserTest, canIgnoreWhitespace));
+    s.push_back(CUTE_SMEMFUN(ParserTest, canIgnoreCommet));
+    s.push_back(CUTE_SMEMFUN(ParserTest, canParseLoadAddress));
+    s.push_back(CUTE_SMEMFUN(ParserTest, canIgnoreOnlyCommet));
 
     cute::makeRunner(lis, argc, argv)(s, "CPUsimTest");
 }

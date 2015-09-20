@@ -1,10 +1,11 @@
 #ifndef SRC_COMPUTERSIM_H_
 #define SRC_COMPUTERSIM_H_
 #include <string>
+#include <vector>
 
 class ComputerSim {
 public:
-    ComputerSim(const int*);
+    ComputerSim(const std::vector<int>&, const int);
     virtual ~ComputerSim();
 
 private:

@@ -6,22 +6,19 @@
 #include "stdio.h"
 #include <unistd.h>
 #include <iostream>
+#include <sstream>
 
-ComputerSim::ComputerSim(const int* program) {
+ComputerSim::ComputerSim(const std::vector<int>& program, const int timerInterval) {
     int cpuToMem[2];
     int memToCpu[2];
     tryPipe(cpuToMem, memToCpu);
     int forkResult = tryFork();
 
     if (isChild(forkResult)) {
-//        int& cpuReadEnd = cpuToMem[0];
-//        int& cpuWriteEnd = memToCpu[1];
-//        Memory m(cpuReadEnd, cpuWriteEnd, program); //TODO fix programLen
+        Memory m(cpuToMem[0], memToCpu[1], program);
         _exit(EXIT_SUCCESS);
     } else if (isParent(forkResult)) {
-        int& memWriteEnd = cpuToMem[1];
-        int& memReadEnd = memToCpu[0];
-        Cpu c(memReadEnd, memWriteEnd, 10);
+        Cpu c(memToCpu[0], cpuToMem[1], timerInterval);
         waitpid(-1, NULL, 0); // wait for child
     }
 }
