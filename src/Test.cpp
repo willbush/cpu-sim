@@ -51,8 +51,8 @@ struct CpuSimTest {
 
     void canLoadValueFromAddressPlusXintoAC() {
         const int len = 8;
-        int instructions[len] = { 1, 666, 7, 1000, 25, 4, 999, 50 };
-        assertCpuEventsEqual("w LV666 SA1000,666 x++ LVFAPX1000,666 e", createVector(instructions, len));
+        int instructions[len] = { 1, 666, 7, 200, 25, 4, 199, 50 };
+        assertCpuEventsEqual("w LV666 SA200,666 x++ LVFAPX200,666 e", createVector(instructions, len));
     }
 
     void canLoadValueFromAddressPlusYintoAC() {
@@ -171,6 +171,44 @@ struct CpuSimTest {
                 createVector(instructions, len));
     }
 
+    void canSubtractACbyX() {
+        const int len = 5;
+        int instructions[len] = { 1, 5, 14, 12, 50 };
+        assertCpuEventsEqual("w LV5 CX5 SUBX5 e", createVector(instructions, len));
+    }
+
+    void canSubtractACbyY() {
+        const int len = 5;
+        int instructions[len] = { 1, 5, 16, 13, 50 };
+        assertCpuEventsEqual("w LV5 CY5 SUBY5 e", createVector(instructions, len));
+    }
+
+    void canChangeSP2AC() {
+        const int len = 4;
+        int instructions[len] = { 1, 88, 18, 50 };
+        assertCpuEventsEqual("w LV88 CSP2AC88,88 e", createVector(instructions, len));
+    }
+
+    void canChangeAC2SP() {
+        const int len = 4;
+        int instructions[len] = { 1, 88, 19, 50 };
+        assertCpuEventsEqual("w LV88 CAC2SP999,999 e", createVector(instructions, len));
+    }
+
+    void canInterruptAndReturn() {
+        const int len = 16;
+        int instructions[len] = { 1, 99, 27, 29, 50, -1000, 30, -1500, 19, 9, 1, 1, 10, 9, 2, 30 };
+        assertCpuEventsEqual(
+                "w LV99 PU998,99 PU997,4 PU1998,997 SM,1 CAC2SP1998,1998 P1,1998 LV10 P2,\n PO1998,997 PO997,4 SM,0 e",
+                createVector(instructions, len));
+    }
+
+    void canLoadFromSPplusX() {
+        const int len = 5;
+        int instructions[len] = { 1, -999, 14, 6, 50 };
+        assertCpuEventsEqual("w LV-999 CX-999 LSP+X0,1 e", createVector(instructions, len));
+    }
+
 private:
     std::vector<int> createVector(int array[], const int len) {
         std::vector<int> v(&array[0], &array[0] + len);
@@ -217,6 +255,12 @@ void runSuite(int argc, char const *argv[]) {
     s.push_back(CUTE_SMEMFUN(CpuSimTest, canCallAddress));
     s.push_back(CUTE_SMEMFUN(CpuSimTest, canReturnFromStack));
     s.push_back(CUTE_SMEMFUN(CpuSimTest, canPrintHi));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canSubtractACbyX));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canSubtractACbyY));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canChangeSP2AC));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canChangeAC2SP));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canInterruptAndReturn));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canLoadFromSPplusX));
 
     cute::makeRunner(lis, argc, argv)(s, "CPUsimTest");
 }

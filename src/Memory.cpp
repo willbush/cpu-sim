@@ -1,8 +1,8 @@
 #include "Memory.h"
 #include <unistd.h>
+#include <iostream>
 
-Memory::Memory(const int& readEndOfPipe, const int& writeEndOfPipe,
-        const std::vector<int>& program)
+Memory::Memory(const int& readEndOfPipe, const int& writeEndOfPipe, const std::vector<int>& program)
         : READ_END_OF_PIPE(readEndOfPipe), WRITE_END_OF_PIPE(writeEndOfPipe) {
 
     initializeMemory(program);
@@ -14,8 +14,20 @@ Memory::~Memory() {
 }
 
 void Memory::initializeMemory(const std::vector<int>& program) {
-    for (unsigned int i = 0; i < program.size(); i++)
-        memory[i] = program[i];
+    unsigned int memIndex , programIndex;
+    memIndex = programIndex = 0;
+
+    while (programIndex < program.size()) {
+        int value = program[programIndex];
+        if (value == -1000) {
+            memIndex = 1000;
+            programIndex++; // move to next instruction
+        } else if (value == -1500) {
+            memIndex = 1500;
+            programIndex++; // move to next instruction
+        }
+        memory[memIndex++] = program[programIndex++];
+    }
 }
 
 void Memory::sendReadySignal() const {
