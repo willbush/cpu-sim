@@ -1,5 +1,5 @@
 <testsuites>
-	<testsuite name="CPUsimTest" tests="30">
+	<testsuite name="CPUsimTest" tests="31">
 		<testcase classname="CPUsimTest" name="CpuSimTest::canLoadValueIntoAC"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canLoadValueIntoAcFromAddress"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canStoreIntoAddressAndLoadFromAddress"/>
@@ -30,5 +30,6 @@
 		<testcase classname="CPUsimTest" name="CpuSimTest::canChangeAC2SP"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canInterruptAndReturn"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canLoadFromSPplusX"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canPreventRecursiveInterrupts"/>
 	</testsuite>
 </testsuites>

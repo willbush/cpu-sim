@@ -14,14 +14,14 @@ ComputerSim::ComputerSim(const int* program) {
     int forkResult = tryFork();
 
     if (isChild(forkResult)) {
-        int& cpuReadEnd = cpuToMem[0];
-        int& cpuWriteEnd = memToCpu[1];
+//        int& cpuReadEnd = cpuToMem[0];
+//        int& cpuWriteEnd = memToCpu[1];
 //        Memory m(cpuReadEnd, cpuWriteEnd, program); //TODO fix programLen
         _exit(EXIT_SUCCESS);
     } else if (isParent(forkResult)) {
         int& memWriteEnd = cpuToMem[1];
         int& memReadEnd = memToCpu[0];
-        Cpu c(memReadEnd, memWriteEnd);
+        Cpu c(memReadEnd, memWriteEnd, 10);
         waitpid(-1, NULL, 0); // wait for child
     }
 }

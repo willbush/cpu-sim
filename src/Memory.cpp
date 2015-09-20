@@ -19,11 +19,11 @@ void Memory::initializeMemory(const std::vector<int>& program) {
 
     while (programIndex < program.size()) {
         int value = program[programIndex];
-        if (value == -1000) {
-            memIndex = 1000;
+        if (value == -TIMER_INTERRUPT_HANDLER_START_ADDRESS) {
+            memIndex = TIMER_INTERRUPT_HANDLER_START_ADDRESS;
             programIndex++; // move to next instruction
-        } else if (value == -1500) {
-            memIndex = 1500;
+        } else if (value == -INTERRUPT_HANDLER_START_ADDRESS) {
+            memIndex = INTERRUPT_HANDLER_START_ADDRESS;
             programIndex++; // move to next instruction
         }
         memory[memIndex++] = program[programIndex++];

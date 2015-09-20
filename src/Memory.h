@@ -9,8 +9,11 @@ public:
 
 private:
     static const int SPACE_AVAILABLE = 2000;
+    static const int TIMER_INTERRUPT_HANDLER_START_ADDRESS = 1000;
+    static const int INTERRUPT_HANDLER_START_ADDRESS = 1500;
     const int &READ_END_OF_PIPE, &WRITE_END_OF_PIPE;
     int memory[SPACE_AVAILABLE];
+
     void initializeMemory(const std::vector<int>&);
     void writeToMemory();
     void listenForCpuCommands();

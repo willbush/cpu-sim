@@ -5,12 +5,14 @@
 #include <iostream>
 #include <sstream>
 
-Cpu::Cpu(const int& readEndOfPipe, const int& writeEndOfPipe)
+Cpu::Cpu(const int& readEndOfPipe, const int& writeEndOfPipe, const int interruptInterval)
         : READ_END_OF_PIPE(readEndOfPipe), WRITE_END_OF_PIPE(writeEndOfPipe) {
-    ir = pc = ac = x = y = 0;
-    sp = USER_STACK_START_ADDRESS;
-    inSystemMode = false;
-    cpuEvents = "";
+    _interruptInterval = interruptInterval;
+    _ir = _pc = _ac = _x = _y = 0;
+    _sp = USER_STACK_START_ADDRESS;
+    _inSystemMode = false;
+    _interruptEnabled = true;
+    _cpuEvents = "";
 
     waitForMemReadySignal();
     runProcessor();
@@ -21,7 +23,7 @@ Cpu::~Cpu() {
 }
 
 void Cpu::waitForMemReadySignal() {
-    cpuEvents += "w ";
+    _cpuEvents += "w ";
     char valueFromPipe;
     read(READ_END_OF_PIPE, &valueFromPipe, sizeof(char));
     if (!isReadySignal(valueFromPipe)) {
@@ -33,14 +35,17 @@ void Cpu::waitForMemReadySignal() {
 }
 
 void Cpu::runProcessor() {
+    unsigned int timer = 0;
+
     do {
-        ir = fetchInstruction();
+        _ir = fetchInstruction();
         processInstruction();
+        timer = checkAndUpdateTimer(timer);
     } while (endNotReached());
 }
 
 void Cpu::processInstruction() {
-    switch (ir) {
+    switch (_ir) {
     case 1:
         loadValue();
         break;
@@ -102,16 +107,16 @@ void Cpu::processInstruction() {
         jumpToAddress(fetchInstruction());
         break;
     case 21:
-        if (ac == 0)
+        if (_ac == 0)
             jumpToAddress(fetchInstruction());
         else
-            pc++;
+            _pc++;
         break;
     case 22:
-        if (ac != 0)
+        if (_ac != 0)
             jumpToAddress(fetchInstruction());
         else
-            pc++;
+            _pc++;
         break;
     case 23:
         callAddress();
@@ -120,21 +125,22 @@ void Cpu::processInstruction() {
         returnFromStack();
         break;
     case 25:
-        cpuEvents += "x++ ";
-        x++;
+        _cpuEvents += "x++ ";
+        _x++;
         break;
     case 26:
-        x--;
-        cpuEvents += "x-- ";
+        _x--;
+        _cpuEvents += "x-- ";
         break;
     case 27:
-        push(ac);
+        push(_ac);
         break;
     case 28:
-        ac = pop();
+        _ac = pop();
         break;
     case 29:
-        interrupt();
+        if (_interruptEnabled)
+            interrupt(INTERRUPT_HANDLER_ADDRESS);
         break;
     case 30:
         returnFromInterrupt();
@@ -142,12 +148,20 @@ void Cpu::processInstruction() {
     }
 }
 
+unsigned int Cpu::checkAndUpdateTimer(unsigned int timer) {
+    if (timer++ >= _interruptInterval && _interruptEnabled) {
+        interrupt(TIMER_INTERRUPT_HANDLER_ADDRESS);
+        timer = 0; // reset
+    }
+    return timer;
+}
+
 int Cpu::fetchInstruction() {
-    return readFromMemory(pc++);
+    return readFromMemory(_pc++);
 }
 
 int Cpu::readFromMemory(int address) {
-    checkAddressAgainstMode(address);
+    checkForAccessVioloation(address);
     char readCommand = 'R';
     write(WRITE_END_OF_PIPE, &readCommand, sizeof(char)); // tell memory I want to read
     write(WRITE_END_OF_PIPE, &address, sizeof(int)); // tell memory the address
@@ -157,17 +171,17 @@ int Cpu::readFromMemory(int address) {
 }
 
 void Cpu::writeToMemory(const int address, const int value) {
-    checkAddressAgainstMode(address);
+    checkForAccessVioloation(address);
     char writeCommand = 'W';
     write(WRITE_END_OF_PIPE, &writeCommand, sizeof(char)); // tell memory I want to write
     write(WRITE_END_OF_PIPE, &address, sizeof(int)); // tell memory the address
     write(WRITE_END_OF_PIPE, &value, sizeof(int)); // tell memory the value
 }
 
-void Cpu::checkAddressAgainstMode(int address) {
-    if (!inSystemMode && address >= 1000)
+void Cpu::checkForAccessVioloation(int address) {
+    if (!_inSystemMode && address >= SYSTEM_START_ADDRESS)
         printMemoryAccessErrAndExit();
-    else if (inSystemMode && address < 1000)
+    else if (_inSystemMode && address < SYSTEM_START_ADDRESS)
         printMemoryAccessErrAndExit();
 }
 
@@ -178,7 +192,7 @@ void Cpu::printMemoryAccessErrAndExit() {
 }
 
 bool Cpu::endNotReached() const {
-    return ir != END_INSTRUCTION;
+    return _ir != END_INSTRUCTION;
 }
 
 bool Cpu::isReadySignal(char command) const {
@@ -186,126 +200,126 @@ bool Cpu::isReadySignal(char command) const {
 }
 
 void Cpu::sendEndCommandToMemory() {
-    cpuEvents += "e";
+    _cpuEvents += "e";
     char endCommand = 'E';
     write(WRITE_END_OF_PIPE, &endCommand, sizeof(char)); // tell memory I want it to end
 }
 
 std::string Cpu::getEvents() const {
-    return cpuEvents;
+    return _cpuEvents;
 }
 
 void Cpu::loadValue() {
     const int value = fetchInstruction();
     std::ostringstream oss;
     oss << "LV" << value << " ";
-    cpuEvents += oss.str();
-    ac = value;
+    _cpuEvents += oss.str();
+    _ac = value;
 }
 
 void Cpu::loadValueFromAddress() {
     const int address = fetchInstruction();
     const int value = readFromMemory(address);
-    ac = value;
+    _ac = value;
 
     std::ostringstream oss;
     oss << "LVFA" << address << "," << value << " ";
-    cpuEvents += oss.str();
+    _cpuEvents += oss.str();
 }
 
 void Cpu::storeAddress() {
     const int address = fetchInstruction();
     std::ostringstream oss;
-    oss << "SA" << address << "," << ac << " ";
-    cpuEvents += oss.str();
-    writeToMemory(address, ac);
+    oss << "SA" << address << "," << _ac << " ";
+    _cpuEvents += oss.str();
+    writeToMemory(address, _ac);
 }
 
 void Cpu::loadAddress() {
     const int address = fetchInstruction();
     std::ostringstream oss;
     const int value = readFromMemory(address);
-    ac = value;
-    oss << "LA" << address << "," << ac << " ";
-    cpuEvents += oss.str();
+    _ac = value;
+    oss << "LA" << address << "," << _ac << " ";
+    _cpuEvents += oss.str();
 }
 
 void Cpu::loadValueFromAddressPlusX() {
-    const int address = fetchInstruction() + x;
+    const int address = fetchInstruction() + _x;
     const int value = readFromMemory(address);
-    ac = value;
+    _ac = value;
 
     std::ostringstream oss;
     oss << "LVFAPX" << address << "," << value << " ";
-    cpuEvents += oss.str();
+    _cpuEvents += oss.str();
 }
 
 void Cpu::loadValueFromAddressPlusY() {
-    const int address = fetchInstruction() + y;
+    const int address = fetchInstruction() + _y;
     const int value = readFromMemory(address);
-    ac = value;
+    _ac = value;
 
     std::ostringstream oss;
     oss << "LVFAPY" << address << "," << value << " ";
-    cpuEvents += oss.str();
+    _cpuEvents += oss.str();
 }
 
 void Cpu::copyACtoX() {
-    x = ac;
+    _x = _ac;
     std::ostringstream oss;
-    oss << "CX" << x << " ";
-    cpuEvents += oss.str();
+    oss << "CX" << _x << " ";
+    _cpuEvents += oss.str();
 }
 
 void Cpu::copyACtoY() {
-    y = ac;
+    _y = _ac;
     std::ostringstream oss;
-    oss << "CY" << y << " ";
-    cpuEvents += oss.str();
+    oss << "CY" << _y << " ";
+    _cpuEvents += oss.str();
 }
 
 void Cpu::copyXtoAC() {
-    ac = x;
+    _ac = _x;
     std::ostringstream oss;
-    oss << "CX2AC" << ac << " ";
-    cpuEvents += oss.str();
+    oss << "CX2AC" << _ac << " ";
+    _cpuEvents += oss.str();
 }
 
 void Cpu::copyYtoAC() {
-    ac = y;
+    _ac = _y;
     std::ostringstream oss;
-    oss << "CY2AC" << ac << " ";
-    cpuEvents += oss.str();
+    oss << "CY2AC" << _ac << " ";
+    _cpuEvents += oss.str();
 }
 
 void Cpu::jumpToAddress(const int address) {
-    pc = address;
+    _pc = address;
     std::ostringstream oss;
-    oss << "JA" << pc << " ";
-    cpuEvents += oss.str();
+    oss << "JA" << _pc << " ";
+    _cpuEvents += oss.str();
 }
 
 void Cpu::putPort() {
     const int port = fetchInstruction();
     std::ostringstream oss;
     if (port == 1) {
-        std::cout << ac;
-        oss << "P1," << ac << " ";
+        std::cout << _ac;
+        oss << "P1," << _ac << " ";
     } else if (port == 2) {
-        char value = ac;
+        char value = _ac;
         std::cout << value;
         oss << "P2," << value << " ";
     }
-    cpuEvents += oss.str();
+    _cpuEvents += oss.str();
 }
 
 void Cpu::callAddress() {
     const int address = fetchInstruction();
-    push(pc);
+    push(_pc);
     jumpToAddress(address);
     std::ostringstream oss;
     oss << "CA" << address << " ";
-    cpuEvents += oss.str();
+    _cpuEvents += oss.str();
 }
 
 void Cpu::returnFromStack() {
@@ -313,22 +327,22 @@ void Cpu::returnFromStack() {
     jumpToAddress(address);
     std::ostringstream oss;
     oss << "RET" << address << " ";
-    cpuEvents += oss.str();
+    _cpuEvents += oss.str();
 }
 
 void Cpu::push(const int value) {
-    writeToMemory(--sp, value);
+    writeToMemory(--_sp, value);
     std::ostringstream oss;
-    oss << "PU" << sp << "," << value << " ";
-    cpuEvents += oss.str();
+    oss << "PU" << _sp << "," << value << " ";
+    _cpuEvents += oss.str();
 }
 
 int Cpu::pop() {
-    const int spCopy = sp;
-    const int poppedValue = readFromMemory(sp++);
+    const int spCopy = _sp;
+    const int poppedValue = readFromMemory(_sp++);
     std::ostringstream oos;
     oos << "PO" << spCopy << "," << poppedValue << " ";
-    cpuEvents += oos.str();
+    _cpuEvents += oos.str();
     return poppedValue;
 }
 
@@ -336,77 +350,79 @@ void Cpu::putRandInAC() {
     const int maxBound = 100;
     const int minBound = 1;
     // random integer on interval [1, 100]
-    ac = rand() % maxBound + minBound;
-    cpuEvents += "R ";
+    _ac = rand() % maxBound + minBound;
+    _cpuEvents += "R ";
 }
 
 void Cpu::addXtoAC() {
     std::ostringstream oos;
-    oos << "AX2AC" << x << "," << ac << " ";
-    cpuEvents += oos.str();
-    ac = ac + x;
+    oos << "AX2AC" << _x << "," << _ac << " ";
+    _cpuEvents += oos.str();
+    _ac = _ac + _x;
 }
 
 void Cpu::addYtoAC() {
     std::ostringstream oos;
-    oos << "AY2AC" << y << "," << ac << " ";
-    cpuEvents += oos.str();
-    ac = ac + y;
+    oos << "AY2AC" << _y << "," << _ac << " ";
+    _cpuEvents += oos.str();
+    _ac = _ac + _y;
 }
 
 void Cpu::subXfromAC() {
-    ac = ac - x;
+    _ac = _ac - _x;
     std::ostringstream oss;
-    oss << "SUBX" << x << " ";
-    cpuEvents += oss.str();
+    oss << "SUBX" << _x << " ";
+    _cpuEvents += oss.str();
 }
 
 void Cpu::subYfromAC() {
-    ac = ac - y;
+    _ac = _ac - _y;
     std::ostringstream oss;
-    oss << "SUBY" << y << " ";
-    cpuEvents += oss.str();
+    oss << "SUBY" << _y << " ";
+    _cpuEvents += oss.str();
 }
 
 void Cpu::changeSP2AC() {
-    sp = ac;
+    _sp = _ac;
     std::ostringstream oss;
-    oss << "CSP2AC" << sp << "," << ac << " ";
-    cpuEvents += oss.str();
+    oss << "CSP2AC" << _sp << "," << _ac << " ";
+    _cpuEvents += oss.str();
 }
 
 void Cpu::changeAC2SP() {
-    ac = sp;
+    _ac = _sp;
     std::ostringstream oss;
-    oss << "CAC2SP" << ac << "," << sp << " ";
-    cpuEvents += oss.str();
+    oss << "CAC2SP" << _ac << "," << _sp << " ";
+    _cpuEvents += oss.str();
 }
 
-void Cpu::interrupt() {
-    push(pc);
-    inSystemMode = true;
-    pc = INTERRUPT_HANDLER_ADDRESS;
-    const int spCopy = sp;
-    sp = SYSTEM_STACK_START_ADDRESS;
+void Cpu::interrupt(const int interruptHandlerAddress) {
+    push(_pc);
+    _inSystemMode = true;
+    _interruptEnabled = false;
+    _pc = interruptHandlerAddress;
+    const int spCopy = _sp;
+    _sp = SYSTEM_STACK_START_ADDRESS;
     push(spCopy);
     std::ostringstream oss;
-    oss << "SM," << inSystemMode << " ";
-    cpuEvents += oss.str();
+    oss << "SM," << _inSystemMode << " ";
+    _cpuEvents += oss.str();
 }
 
 void Cpu::returnFromInterrupt() {
-    sp = pop();
-    inSystemMode = false;
-    pc = pop();
+    _sp = pop();
+    _inSystemMode = false;
+    _interruptEnabled = true;
+    _pc = pop();
 
     std::ostringstream oss;
-    oss << "SM," << inSystemMode << " ";
-    cpuEvents += oss.str();
+    oss << "SM," << _inSystemMode << " ";
+    _cpuEvents += oss.str();
 }
 
 void Cpu::loadFromSpPlusX() {
-    ac = readFromMemory(sp + x);
+    _ac = readFromMemory(_sp + _x);
     std::ostringstream oss;
-    oss << "LSP+X" << (sp + x) << "," << ac << " ";
-    cpuEvents += oss.str();
+    oss << "LSP+X" << (_sp + _x) << "," << _ac << " ";
+    _cpuEvents += oss.str();
 }
