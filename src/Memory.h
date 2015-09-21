@@ -1,10 +1,11 @@
 #ifndef SRC_MEMORY_H_
 #define SRC_MEMORY_H_
 #include <vector>
+#include <string>
 
 class Memory {
 public:
-    Memory(const int&, const int&, const std::vector<int>&);
+    Memory(const int&, const int&, const std::vector<std::string>&);
     virtual ~Memory();
 
 private:
@@ -14,7 +15,7 @@ private:
     const int &READ_END_OF_PIPE, &WRITE_END_OF_PIPE;
     int memory[SPACE_AVAILABLE];
 
-    void initializeMemory(const std::vector<int>&);
+    void initializeMemory(const std::vector<std::string>&);
     void writeToMemory();
     void listenForCpuCommands();
     void performCommand(char);

@@ -8,7 +8,7 @@
 #include <iostream>
 #include <sstream>
 
-ComputerSim::ComputerSim(const std::vector<int>& program, const int timerInterval) {
+ComputerSim::ComputerSim(const std::vector<std::string>& program, const int timerInterval) {
     int cpuToMem[2];
     int memToCpu[2];
     tryPipe(cpuToMem, memToCpu);

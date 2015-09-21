@@ -5,7 +5,7 @@
 
 class ComputerSim {
 public:
-    ComputerSim(const std::vector<int>&, const int);
+    ComputerSim(const std::vector<std::string>&, const int);
     virtual ~ComputerSim();
 
 private:

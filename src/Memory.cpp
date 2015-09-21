@@ -1,8 +1,9 @@
 #include "Memory.h"
 #include <unistd.h>
+#include <stdlib.h>
 #include <iostream>
 
-Memory::Memory(const int& readEndOfPipe, const int& writeEndOfPipe, const std::vector<int>& program)
+Memory::Memory(const int& readEndOfPipe, const int& writeEndOfPipe, const std::vector<std::string>& program)
         : READ_END_OF_PIPE(readEndOfPipe), WRITE_END_OF_PIPE(writeEndOfPipe) {
 
     initializeMemory(program);
@@ -13,17 +14,18 @@ Memory::Memory(const int& readEndOfPipe, const int& writeEndOfPipe, const std::v
 Memory::~Memory() {
 }
 
-void Memory::initializeMemory(const std::vector<int>& program) {
-    unsigned int memIndex , programIndex;
+void Memory::initializeMemory(const std::vector<std::string>& program) {
+    unsigned int memIndex, programIndex;
     memIndex = programIndex = 0;
 
     while (programIndex < program.size()) {
-        int value = program[programIndex];
-        if (value < 0) { // negative numbers represent a load address
-            memIndex = -value; // index is the positive value
+        std::string value = program[programIndex];
+        if (value[0] == '.') { // period represent a load address
+            std::string subStr = value.substr(1, value.size() - 1); // remove period
+            memIndex = atoi(subStr.c_str());
             programIndex++; // move to next instruction
         }
-        memory[memIndex++] = program[programIndex++];
+        memory[memIndex++] = atoi(program[programIndex++].c_str());
     }
 }
 

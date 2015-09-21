@@ -1,6 +1,14 @@
 <testsuites>
-	<testsuite name="CPUsimTest" tests="36">
-		<testcase classname="CPUsimTest" name="CpuSimTest::canLoadValueIntoAC"/>
+	<testsuite name="CPUsimTest" tests="34">
+		<testcase classname="CPUsimTest" name="CpuSimTest::canPrintData"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::memAccessAndStackTest"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canPrintHappyFace"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::interruptAcceptanceTest"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canPutPortOne"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canPutPortTwo"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canAddTwoRandAndPrint"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canPrintHi"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canInterruptAndReturn"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canLoadValueIntoAcFromAddress"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canStoreIntoAddressAndLoadFromAddress"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canIncrementandDecrementX"/>
@@ -13,28 +21,18 @@
 		<testcase classname="CPUsimTest" name="CpuSimTest::canJumpToAddress"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canJumpToAddressIfAcIsZero"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canJumpToAddressIfAcIsNotZero"/>
-		<testcase classname="CPUsimTest" name="CpuSimTest::canPutPortOne"/>
-		<testcase classname="CPUsimTest" name="CpuSimTest::canPutPortTwo"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canPush"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canPushAndPop"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canPutRandInAC"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canAddXtoAC"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canAddYtoAC"/>
-		<testcase classname="CPUsimTest" name="CpuSimTest::canAddTwoRandAndPrint"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canCallAddress"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canReturnFromStack"/>
-		<testcase classname="CPUsimTest" name="CpuSimTest::canPrintHi"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canSubtractACbyX"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canSubtractACbyY"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canChangeSP2AC"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canChangeAC2SP"/>
-		<testcase classname="CPUsimTest" name="CpuSimTest::canInterruptAndReturn"/>
-		<testcase classname="CPUsimTest" name="CpuSimTest::canLoadFromSPplusX"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canPreventRecursiveInterrupts"/>
-		<testcase classname="CPUsimTest" name="CpuSimTest::acceptanceTest"/>
-		<testcase classname="CPUsimTest" name="ParserTest::canIgnoreWhitespace"/>
-		<testcase classname="CPUsimTest" name="ParserTest::canIgnoreCommet"/>
-		<testcase classname="CPUsimTest" name="ParserTest::canParseLoadAddress"/>
-		<testcase classname="CPUsimTest" name="ParserTest::canIgnoreOnlyCommet"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canLoadFromSPplusX"/>
 	</testsuite>
 </testsuites>
