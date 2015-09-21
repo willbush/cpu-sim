@@ -149,9 +149,14 @@ void Cpu::processInstruction() {
 }
 
 unsigned int Cpu::checkAndUpdateTimer(unsigned int timer) {
-    if (timer++ >= _interruptInterval && _interruptEnabled) {
-        interrupt(TIMER_INTERRUPT_HANDLER_ADDRESS);
-        timer = 0; // reset
+    if (_interruptEnabled) {
+        // running the timer while running the interrupt handler can cause an infinite loop
+        timer++;
+
+        if (timer >= _interruptInterval) {
+            interrupt(TIMER_INTERRUPT_HANDLER_ADDRESS);
+            timer = 0; // reset
+        }
     }
     return timer;
 }
@@ -180,8 +185,6 @@ void Cpu::writeToMemory(const int address, const int value) {
 
 void Cpu::checkForAccessVioloation(int address) {
     if (!_inSystemMode && address >= SYSTEM_START_ADDRESS)
-        printMemoryAccessErrAndExit();
-    else if (_inSystemMode && address < SYSTEM_START_ADDRESS)
         printMemoryAccessErrAndExit();
 }
 
@@ -397,23 +400,28 @@ void Cpu::changeAC2SP() {
 }
 
 void Cpu::interrupt(const int interruptHandlerAddress) {
-    push(_pc);
     _inSystemMode = true;
     _interruptEnabled = false;
-    _pc = interruptHandlerAddress;
+    const int pcCopy = _pc;
     const int spCopy = _sp;
+
+    // set program counter to interrupt handler and stack pointer to system stack
+    _pc = interruptHandlerAddress;
     _sp = SYSTEM_STACK_START_ADDRESS;
+
+    // save user stack pointer and program counter to system stack
     push(spCopy);
+    push(pcCopy);
     std::ostringstream oss;
     oss << "SM," << _inSystemMode << " ";
     _cpuEvents += oss.str();
 }
 
 void Cpu::returnFromInterrupt() {
+    _pc = pop();
     _sp = pop();
     _inSystemMode = false;
     _interruptEnabled = true;
-    _pc = pop();
 
     std::ostringstream oss;
     oss << "SM," << _inSystemMode << " ";
