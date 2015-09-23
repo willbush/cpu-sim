@@ -5,6 +5,7 @@
 #include "xml_listener.h"
 #include "cute_runner.h"
 #include "sys/wait.h"
+#include "stdlib.h"
 
 struct CpuSimTest {
     int _forkResult;
@@ -166,11 +167,22 @@ struct CpuSimTest {
         ASSERT_EQUAL("", coutBuffer.str());
     }
 
-    void canAddTwoRandAndPrint() {
+    void canPrintRandomInt() {
+        const int len = 6;
+        std::string instructions[len] = { "8", "9", "1", "50", ".1000", "30" };
+        runCpu(createVector(instructions, len));
+        int actual = atoi(coutBuffer.str().c_str());
+        ASSERT_GREATER_EQUAL(actual, 1);
+        ASSERT_LESS_EQUAL(actual, 100);
+    }
+
+    void canAddThreeRandAndPrint() {
         const int len = 12;
         std::string instructions[len] = { "8", "14", "8", "16", "8", "10", "11", "9", "1", "50", ".1000", "30" };
         runCpu(createVector(instructions, len));
-        ASSERT_EQUAL("249", coutBuffer.str());
+        int actual = atoi(coutBuffer.str().c_str());
+        ASSERT_GREATER_EQUAL(actual, 1);
+        ASSERT_LESS_EQUAL(actual, 300);
     }
 
     void canCallAddress() {
@@ -228,7 +240,7 @@ struct CpuSimTest {
         std::string instructions[len] = { "1", "99", "27", "29", "28", "50", ".1000", "30", ".1500", "19", "9", "1",
                 "1", "10", "9", "2", "30" };
         runCpu(createVector(instructions, len));
-        ASSERT_EQUAL("1997\n", coutBuffer.str());
+        ASSERT_EQUAL("1998\n", coutBuffer.str());
     }
 
     void canPreventRecursiveInterrupts() {
@@ -264,7 +276,7 @@ struct CpuSimTest {
                 "10", "9", "2", "30" };
         ASSERT_THROWSM("ERROR: Attempted to access a protected memory location.",
                 runCpu(createVector(instructions, len)), std::runtime_error);
-        ASSERT_EQUAL("999\n998\n999\n1997\n1996\n1997\n", coutBuffer.str());
+        ASSERT_EQUAL("1000\n999\n1000\n1998\n1997\n1998\n", coutBuffer.str());
     }
 
     void canPrintHappyFace() {
@@ -327,7 +339,7 @@ void runSuite(int argc, char const *argv[]) {
     s.push_back(CUTE_SMEMFUN(CpuSimTest, interruptAcceptanceTest));
     s.push_back(CUTE_SMEMFUN(CpuSimTest, canPutPortOne));
     s.push_back(CUTE_SMEMFUN(CpuSimTest, canPutPortTwo));
-    s.push_back(CUTE_SMEMFUN(CpuSimTest, canAddTwoRandAndPrint));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canAddThreeRandAndPrint));
     s.push_back(CUTE_SMEMFUN(CpuSimTest, canPrintHi));
     s.push_back(CUTE_SMEMFUN(CpuSimTest, canInterruptAndReturn));
 	s.push_back(CUTE_SMEMFUN(CpuSimTest, canLoadValueIntoAcFromAddress));
@@ -355,6 +367,7 @@ void runSuite(int argc, char const *argv[]) {
 	s.push_back(CUTE_SMEMFUN(CpuSimTest, canChangeAC2SP));
 	s.push_back(CUTE_SMEMFUN(CpuSimTest, canPreventRecursiveInterrupts));
 	s.push_back(CUTE_SMEMFUN(CpuSimTest, canLoadFromSPplusX));
+	s.push_back(CUTE_SMEMFUN(CpuSimTest, canPrintRandomInt));
 
     cute::makeRunner(lis, argc, argv)(s, "CPUsimTest");
 }

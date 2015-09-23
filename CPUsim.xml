@@ -1,12 +1,12 @@
 <testsuites>
-	<testsuite name="CPUsimTest" tests="34">
+	<testsuite name="CPUsimTest" tests="35">
 		<testcase classname="CPUsimTest" name="CpuSimTest::canPrintData"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::memAccessAndStackTest"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canPrintHappyFace"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::interruptAcceptanceTest"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canPutPortOne"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canPutPortTwo"/>
-		<testcase classname="CPUsimTest" name="CpuSimTest::canAddTwoRandAndPrint"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canAddThreeRandAndPrint"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canPrintHi"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canInterruptAndReturn"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canLoadValueIntoAcFromAddress"/>
@@ -34,5 +34,6 @@
 		<testcase classname="CPUsimTest" name="CpuSimTest::canChangeAC2SP"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canPreventRecursiveInterrupts"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canLoadFromSPplusX"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canPrintRandomInt"/>
 	</testsuite>
 </testsuites>

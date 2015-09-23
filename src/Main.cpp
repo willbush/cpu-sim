@@ -11,9 +11,10 @@ void checkArgCount(int);
 int tryParseTimer(const string&);
 void checkTimerInterval(const int);
 void checkIfFileExist(const string&);
-bool fileExist(const std::string&);
-vector<int> parseSourceFile(const string&);
-bool tryPraseLine(const std::string&, int&);
+bool fileExist(const string&);
+vector<string> parseSourceFile(const string&);
+bool tryPraseLine(const string&, string&);
+void tryRunComputerSim(const vector<string>&, const int);
 
 //int main(int argc, char const *argv[]) {
 //    checkArgCount(argc);
@@ -24,8 +25,8 @@ bool tryPraseLine(const std::string&, int&);
 //    checkTimerInterval(timerInterval);
 //    checkIfFileExist(filepath);
 //
-//    vector<int> program = parseSourceFile(filepath);
-//    ComputerSim c(program, timerInterval);
+//    vector<string> program = parseSourceFile(filepath);
+//    tryRunComputerSim(program, timerInterval);
 //}
 
 void checkArgCount(int argc) {
@@ -49,7 +50,6 @@ int tryParseTimer(const string& intervalTimerStr) {
     return intervalTimer;
 }
 
-
 void checkTimerInterval(const int timerInterval) {
     if (timerInterval <= 0) {
         cerr << "timer interval: " << timerInterval << " must be greater than 0\n";
@@ -64,43 +64,55 @@ void checkIfFileExist(const string& filepath) {
     }
 }
 
-bool fileExist(const std::string& path) {
+bool fileExist(const string& path) {
     return ifstream(path.c_str());
 }
 
-vector<int> parseSourceFile(const string& path) {
+vector<string> parseSourceFile(const string& path) {
     fstream sourceFile;
-    vector<int> program;
+    vector<string> program;
     sourceFile.open(path.c_str(), ios::in);
     string line;
 
     while (getline(sourceFile, line)) {
-        int codeInput;
-        if (tryPraseLine(line, codeInput))
-            program.push_back(codeInput);
+        string parsedOutput;
+        if (tryPraseLine(line, parsedOutput))
+            program.push_back(parsedOutput);
     }
     sourceFile.close();
     return program;
 }
 
-bool tryPraseLine(const std::string& line, int& outputValue) {
+bool tryPraseLine(const string& line, string& outputValue) {
     int value;
     bool isParsed = false;
 
     if (line[0] == '.') {
-        // remove period
-        std::string subStr = line.substr(1, line.size() - 1);
-        std::istringstream input(subStr);
-        if (input >> value) {
-            outputValue = -value;
+        string subStr = line.substr(1, line.size() - 1); // remove period
+        istringstream input(subStr);
+        if (input >> value) { // get first integer value on the line
+            ostringstream oss;
+            oss << "." << value;
+            outputValue = oss.str();
             isParsed = true;
         }
     } else {
-        std::istringstream input(line);
+        istringstream input(line);
         if (input >> value) {
-            outputValue = value;
+            ostringstream oss;
+            oss << value;
+            outputValue = oss.str();
             isParsed = true;
         }
     }
     return isParsed;
+}
+
+void tryRunComputerSim(const vector<string>& program, const int timerInterval) {
+    try {
+        ComputerSim c(program, timerInterval);
+    } catch (exception &e) {
+        cout << e.what() << endl;
+        exit(EXIT_FAILURE);
+    }
 }

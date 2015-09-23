@@ -1,5 +1,4 @@
 #include "Cpu.h"
-#include "stdio.h"
 #include "stdlib.h"
 #include <unistd.h>
 #include <stdexcept>
@@ -25,10 +24,10 @@ void Cpu::waitForMemReadySignal() {
     char valueFromPipe;
     read(READ_END_OF_PIPE, &valueFromPipe, sizeof(char));
     if (!isReadySignal(valueFromPipe)) {
-        std::cerr << "ERROR: First read value from the pipe to "
+        std::string errorMsg = "ERROR: First read value from the pipe to "
                 "the memory was not a ready state signal as it should be.\n";
         sendEndCommandToMemory();
-        _exit(EXIT_FAILURE);
+        throw std::runtime_error(errorMsg);
     }
 }
 
@@ -51,7 +50,7 @@ void Cpu::processInstruction() {
         _ac = readFromMemory(fetchInstruction());
         break;
     case 3:
-        _ac = readFromMemory(fetchInstruction());
+        _ac = readFromMemory(readFromMemory(fetchInstruction()));
         break;
     case 4:
         _ac = readFromMemory(fetchInstruction() + _x);
@@ -182,13 +181,10 @@ void Cpu::writeToMemory(const int address, const int value) {
 }
 
 void Cpu::checkForAccessVioloation(int address) {
-    if (!_inSystemMode && address >= SYSTEM_START_ADDRESS)
-        printMemoryAccessErrAndExit();
-}
-
-void Cpu::printMemoryAccessErrAndExit() {
-    sendEndCommandToMemory();
-    throw std::runtime_error("ERROR: Attempted to access a protected memory location.\n");
+    if (!_inSystemMode && address >= SYSTEM_START_ADDRESS) {
+        sendEndCommandToMemory();
+        throw std::runtime_error("ERROR: Attempted to access a protected memory location.\n");
+    }
 }
 
 bool Cpu::endNotReached() const {
@@ -235,6 +231,7 @@ int Cpu::pop() {
 void Cpu::putRandInAC() {
     const int maxBound = 100;
     const int minBound = 1;
+    srand(time(NULL));
     // random integer on interval [1, 100]
     _ac = rand() % maxBound + minBound;
 }

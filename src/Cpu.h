@@ -1,6 +1,5 @@
 #ifndef SRC_CPU_H_
 #define SRC_CPU_H_
-#include <string>
 
 class Cpu {
 public:
@@ -9,8 +8,8 @@ public:
     virtual ~Cpu();
 
 private:
-    static const int USER_STACK_START_ADDRESS = 999;
-    static const int SYSTEM_STACK_START_ADDRESS = 1999;
+    static const int USER_STACK_START_ADDRESS = 1000;
+    static const int SYSTEM_STACK_START_ADDRESS = 2000;
     static const int SYSTEM_START_ADDRESS = 1000;
     static const int TIMER_INTERRUPT_HANDLER_ADDRESS = 1000;
     static const int INTERRUPT_HANDLER_ADDRESS = 1500;
@@ -38,7 +37,6 @@ private:
     void interrupt(const int);
     void returnFromInterrupt();
     void checkForAccessVioloation(int);
-    void printMemoryAccessErrAndExit();
     unsigned int checkAndUpdateTimer(unsigned int);
 };
 

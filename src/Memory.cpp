@@ -1,7 +1,6 @@
 #include "Memory.h"
 #include <unistd.h>
 #include <stdlib.h>
-#include <iostream>
 
 Memory::Memory(const int& readEndOfPipe, const int& writeEndOfPipe, const std::vector<std::string>& program)
         : READ_END_OF_PIPE(readEndOfPipe), WRITE_END_OF_PIPE(writeEndOfPipe) {
