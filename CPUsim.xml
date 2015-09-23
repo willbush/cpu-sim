@@ -1,5 +1,5 @@
 <testsuites>
-	<testsuite name="CPUsimTest" tests="35">
+	<testsuite name="CPUsimTest" tests="36">
 		<testcase classname="CPUsimTest" name="CpuSimTest::canPrintData"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::memAccessAndStackTest"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canPrintHappyFace"/>
@@ -35,5 +35,6 @@
 		<testcase classname="CPUsimTest" name="CpuSimTest::canPreventRecursiveInterrupts"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canLoadFromSPplusX"/>
 		<testcase classname="CPUsimTest" name="CpuSimTest::canPrintRandomInt"/>
+		<testcase classname="CPUsimTest" name="CpuSimTest::canLoadAddressIndirect"/>
 	</testsuite>
 </testsuites>

@@ -44,6 +44,14 @@ struct CpuSimTest {
         ASSERT_EQUAL("", coutBuffer.str());
     }
 
+    void canLoadAddressIndirect() {
+        const int len = 12;
+        // put address 550 at address 500 and the value 77 at 550 then load 77 into the AC indirectly with instruction 3
+        std::string instructions[len] = { ".500", "550", ".550", "77", ".0", "3", "500", "9", "1", "50", ".1000", "30" };
+        runCpu(createVector(instructions, len));
+        ASSERT_EQUAL("77", coutBuffer.str());
+    }
+
     void canIncrementandDecrementX() {
         const int len = 6;
         // increment registers x twice and y once
@@ -281,20 +289,20 @@ struct CpuSimTest {
 
     void canPrintHappyFace() {
         const int len = 240;
-        std::string instructions[len] = { ".0", "23", "15", "23", "30", "23", "51", "23", "86", "23", "103", "23", "142",
-                "23", "163", "50", "1", "4", "27", "23", "206", "28", "1", "6", "27", "23", "178", "28", "23", "220",
-                "24", "1", "32", "9", "2", "1", "47", "9", "2", "1", "9", "27", "23", "206", "28", "1", "92", "9", "2",
-                "23", "220", "24", "1", "47", "9", "2", "1", "32", "9", "2", "9", "2", "9", "2", "23", "225", "1", "32",
-                "9", "2", "9", "2", "23", "225", "1", "32", "9", "2", "9", "2", "1", "92", "9", "2", "23", "220", "24",
-                "1", "124", "9", "2", "1", "11", "27", "23", "206", "28", "1", "124", "9", "2", "23", "220", "24", "1",
-                "92", "9", "2", "1", "32", "9", "2", "9", "2", "9", "2", "1", "92", "9", "2", "1", "4", "27", "23",
-                "192", "28", "1", "47", "9", "2", "1", "32", "9", "2", "9", "2", "1", "47", "9", "2", "23", "220", "24",
-                "1", "32", "9", "2", "1", "92", "9", "2", "1", "9", "27", "23", "206", "28", "1", "47", "9", "2", "23",
-                "220", "24", "1", "4", "27", "23", "206", "28", "1", "6", "27", "23", "178", "28", "23", "220", "24",
-                "1", "1", "14", "6", "14", "1", "45", "9", "2", "26", "15", "22", "183", "24", "1", "1", "14", "6",
-                "14", "1", "95", "9", "2", "26", "15", "22", "197", "24", "1", "1", "14", "6", "14", "1", "32", "9",
-                "2", "26", "15", "22", "211", "24", "1", "10", "9", "2", "24", "1", "45", "9", "2", "1", "42", "9", "2",
-                "24", ".1000", "30" };
+        std::string instructions[len] = { ".0", "23", "15", "23", "30", "23", "51", "23", "86", "23", "103", "23",
+                "142", "23", "163", "50", "1", "4", "27", "23", "206", "28", "1", "6", "27", "23", "178", "28", "23",
+                "220", "24", "1", "32", "9", "2", "1", "47", "9", "2", "1", "9", "27", "23", "206", "28", "1", "92",
+                "9", "2", "23", "220", "24", "1", "47", "9", "2", "1", "32", "9", "2", "9", "2", "9", "2", "23", "225",
+                "1", "32", "9", "2", "9", "2", "23", "225", "1", "32", "9", "2", "9", "2", "1", "92", "9", "2", "23",
+                "220", "24", "1", "124", "9", "2", "1", "11", "27", "23", "206", "28", "1", "124", "9", "2", "23",
+                "220", "24", "1", "92", "9", "2", "1", "32", "9", "2", "9", "2", "9", "2", "1", "92", "9", "2", "1",
+                "4", "27", "23", "192", "28", "1", "47", "9", "2", "1", "32", "9", "2", "9", "2", "1", "47", "9", "2",
+                "23", "220", "24", "1", "32", "9", "2", "1", "92", "9", "2", "1", "9", "27", "23", "206", "28", "1",
+                "47", "9", "2", "23", "220", "24", "1", "4", "27", "23", "206", "28", "1", "6", "27", "23", "178", "28",
+                "23", "220", "24", "1", "1", "14", "6", "14", "1", "45", "9", "2", "26", "15", "22", "183", "24", "1",
+                "1", "14", "6", "14", "1", "95", "9", "2", "26", "15", "22", "197", "24", "1", "1", "14", "6", "14",
+                "1", "32", "9", "2", "26", "15", "22", "211", "24", "1", "10", "9", "2", "24", "1", "45", "9", "2", "1",
+                "42", "9", "2", "24", ".1000", "30" };
         std::string expected = "    ------\n /         \\\n/   -*  -*  \\\n|           |\n\\   \\____/  /\n \\         /\n    ------\n";
         runCpu(createVector(instructions, len));
         ASSERT_EQUAL(expected, coutBuffer.str());
@@ -303,9 +311,9 @@ struct CpuSimTest {
     void interruptAcceptanceTest() {
         const int len = 70;
         std::string instructions[len] = { "1", "10", "14", "1", "65", "9", "2", "1", "10", "9", "2", "29", "26", "15",
-                "22", "3", "50", ".1000", "27", "15", "27", "17", "27", "2", "1700", "14", "25", "15", "7", "1700", "28",
-                "16", "28", "14", "28", "30", ".1500", "27", "15", "27", "17", "27", "2", "1700", "9", "1", "1", "10",
-                "9", "2", "28", "16", "28", "14", "28", "30", ".1700", "0" };
+                "22", "3", "50", ".1000", "27", "15", "27", "17", "27", "2", "1700", "14", "25", "15", "7", "1700",
+                "28", "16", "28", "14", "28", "30", ".1500", "27", "15", "27", "17", "27", "2", "1700", "9", "1", "1",
+                "10", "9", "2", "28", "16", "28", "14", "28", "30", ".1700", "0" };
         std::string expected = "A\n0\nA\n1\nA\n2\nA\n2\nA\n3\nA\n4\nA\n4\nA\n5\nA\n6\nA\n6\n";
         runCpu(createVector(instructions, len));
         ASSERT_EQUAL(expected, coutBuffer.str());
@@ -342,32 +350,33 @@ void runSuite(int argc, char const *argv[]) {
     s.push_back(CUTE_SMEMFUN(CpuSimTest, canAddThreeRandAndPrint));
     s.push_back(CUTE_SMEMFUN(CpuSimTest, canPrintHi));
     s.push_back(CUTE_SMEMFUN(CpuSimTest, canInterruptAndReturn));
-	s.push_back(CUTE_SMEMFUN(CpuSimTest, canLoadValueIntoAcFromAddress));
-	s.push_back(CUTE_SMEMFUN(CpuSimTest, canStoreIntoAddressAndLoadFromAddress));
-	s.push_back(CUTE_SMEMFUN(CpuSimTest, canIncrementandDecrementX));
-	s.push_back(CUTE_SMEMFUN(CpuSimTest, canLoadValueFromAddressPlusXintoAC));
-	s.push_back(CUTE_SMEMFUN(CpuSimTest, canLoadValueFromAddressPlusYintoAC));
-	s.push_back(CUTE_SMEMFUN(CpuSimTest, canCopyToX));
-	s.push_back(CUTE_SMEMFUN(CpuSimTest, canCopyToY));
-	s.push_back(CUTE_SMEMFUN(CpuSimTest, canCopyXtoAC));
-	s.push_back(CUTE_SMEMFUN(CpuSimTest, canCopyYtoAC));
-	s.push_back(CUTE_SMEMFUN(CpuSimTest, canJumpToAddress));
-	s.push_back(CUTE_SMEMFUN(CpuSimTest, canJumpToAddressIfAcIsZero));
-	s.push_back(CUTE_SMEMFUN(CpuSimTest, canJumpToAddressIfAcIsNotZero));
-	s.push_back(CUTE_SMEMFUN(CpuSimTest, canPush));
-	s.push_back(CUTE_SMEMFUN(CpuSimTest, canPushAndPop));
-	s.push_back(CUTE_SMEMFUN(CpuSimTest, canPutRandInAC));
-	s.push_back(CUTE_SMEMFUN(CpuSimTest, canAddXtoAC));
-	s.push_back(CUTE_SMEMFUN(CpuSimTest, canAddYtoAC));
-	s.push_back(CUTE_SMEMFUN(CpuSimTest, canCallAddress));
-	s.push_back(CUTE_SMEMFUN(CpuSimTest, canReturnFromStack));
-	s.push_back(CUTE_SMEMFUN(CpuSimTest, canSubtractACbyX));
-	s.push_back(CUTE_SMEMFUN(CpuSimTest, canSubtractACbyY));
-	s.push_back(CUTE_SMEMFUN(CpuSimTest, canChangeSP2AC));
-	s.push_back(CUTE_SMEMFUN(CpuSimTest, canChangeAC2SP));
-	s.push_back(CUTE_SMEMFUN(CpuSimTest, canPreventRecursiveInterrupts));
-	s.push_back(CUTE_SMEMFUN(CpuSimTest, canLoadFromSPplusX));
-	s.push_back(CUTE_SMEMFUN(CpuSimTest, canPrintRandomInt));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canLoadValueIntoAcFromAddress));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canStoreIntoAddressAndLoadFromAddress));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canIncrementandDecrementX));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canLoadValueFromAddressPlusXintoAC));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canLoadValueFromAddressPlusYintoAC));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canCopyToX));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canCopyToY));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canCopyXtoAC));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canCopyYtoAC));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canJumpToAddress));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canJumpToAddressIfAcIsZero));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canJumpToAddressIfAcIsNotZero));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canPush));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canPushAndPop));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canPutRandInAC));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canAddXtoAC));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canAddYtoAC));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canCallAddress));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canReturnFromStack));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canSubtractACbyX));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canSubtractACbyY));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canChangeSP2AC));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canChangeAC2SP));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canPreventRecursiveInterrupts));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canLoadFromSPplusX));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canPrintRandomInt));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canLoadAddressIndirect));
 
     cute::makeRunner(lis, argc, argv)(s, "CPUsimTest");
 }
