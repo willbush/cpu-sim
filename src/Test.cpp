@@ -29,11 +29,18 @@ struct CpuSimTest {
         std::cout.rdbuf(old);
     }
 
-    void canLoadValueIntoAcFromAddress() {
-        const int len = 9;
-        std::string instructions[len] = { "1", "77", "7", "20", "3", "20", "50", ".1000", "30" };
+    void canLoadIntoAC() {
+        const int len = 7;
+        std::string instructions[len] = { "1", "77", "9", "1", "50", ".1000", "30" };
         runCpu(createVector(instructions, len));
-        ASSERT_EQUAL("", coutBuffer.str());
+        ASSERT_EQUAL("77", coutBuffer.str());
+    }
+
+    void canLoadValueIntoAcFromAddress() {
+        const int len = 10;
+        std::string instructions[len] = { ".20", "55", ".0", "2", "20", "9", "1", "50", ".1000", "30" };
+        runCpu(createVector(instructions, len));
+        ASSERT_EQUAL("55", coutBuffer.str());
     }
 
     void canStoreIntoAddressAndLoadFromAddress() {
@@ -377,6 +384,8 @@ void runSuite(int argc, char const *argv[]) {
     s.push_back(CUTE_SMEMFUN(CpuSimTest, canLoadFromSPplusX));
     s.push_back(CUTE_SMEMFUN(CpuSimTest, canPrintRandomInt));
     s.push_back(CUTE_SMEMFUN(CpuSimTest, canLoadAddressIndirect));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canLoadIntoAC));
+    s.push_back(CUTE_SMEMFUN(CpuSimTest, canLoadIntoAC));
 
     cute::makeRunner(lis, argc, argv)(s, "CPUsimTest");
 }

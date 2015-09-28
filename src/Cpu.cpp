@@ -207,10 +207,10 @@ void Cpu::jumpToAddress(const int address) {
 void Cpu::putPort() {
     const int port = fetchInstruction();
     if (port == 1) {
-        std::cout << _ac;
+        std::cout << _ac << std::flush;
     } else if (port == 2) {
         char value = _ac;
-        std::cout << value;
+        std::cout << value << std::flush;
     }
 }
 
