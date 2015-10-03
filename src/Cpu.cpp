@@ -43,79 +43,81 @@ void Cpu::runProcessor() {
 
 void Cpu::processInstruction() {
     switch (_ir) {
-    case 1:
+    case 1: // load value
         _ac = fetchInstruction();
         break;
-    case 2:
+    case 2: // load value at the address into the AC
         _ac = readFromMemory(fetchInstruction());
         break;
-    case 3:
+    case 3: // Use the AC value as an address to a another value.
+        // this new value is also used as an address to the final value.
         _ac = readFromMemory(readFromMemory(fetchInstruction()));
         break;
-    case 4:
+    case 4: // load the value at address + X into the AC
         _ac = readFromMemory(fetchInstruction() + _x);
         break;
-    case 5:
+    case 5: // load the value at the address + Y into the AC
         _ac = readFromMemory(fetchInstruction() + _y);
         break;
-    case 6:
+    case 6: // from from sp + X into the AC
         _ac = readFromMemory(_sp + _x);
         break;
-    case 7:
+    case 7: // store the AC value into the following address
         writeToMemory(fetchInstruction(), _ac);
         break;
-    case 8:
+    case 8: // Get a random integer from interval [1, 100]
         putRandInAC();
         break;
-    case 9:
+    case 9: // write the AC to the screen as an integer if following value is 1
+        // or as an char if the following value is 2
         putPort();
         break;
-    case 10:
+    case 10: // add the value in X to the AC
         _ac = _ac + _x;
         break;
-    case 11:
+    case 11: // add the value in Y to the AC
         _ac = _ac + _y;
         break;
-    case 12:
+    case 12: // subtract the value in X from the AC
         _ac = _ac - _x;
         break;
-    case 13:
+    case 13: // subtract the value in Y from the AC
         _ac = _ac - _y;
         break;
-    case 14:
+    case 14: // Copy AC to X
         _x = _ac;
         break;
-    case 15:
+    case 15: // Copy X to AC
         _ac = _x;
         break;
-    case 16:
+    case 16: // Copy AC to Y
         _y = _ac;
         break;
-    case 17:
+    case 17: // Copy Y to AC
         _ac = _y;
         break;
-    case 18:
+    case 18: // Copy AC to SP
         _sp = _ac;
         break;
-    case 19:
+    case 19: // Copy SP to AC
         _ac = _sp;
         break;
-    case 20:
+    case 20: // Jump to following address
         jumpToAddress(fetchInstruction());
         break;
-    case 21:
+    case 21: // jump to address if AC == 0
         if (_ac == 0)
             jumpToAddress(fetchInstruction());
         else
             _pc++;
         break;
-    case 22:
+    case 22: // jump to address if AC != 0
         if (_ac != 0)
             jumpToAddress(fetchInstruction());
         else
             _pc++;
         break;
-    case 23:
+    case 23: // push return address onto the stack and jump to the following address
         callAddress();
         break;
     case 24: // return from stack
@@ -133,11 +135,11 @@ void Cpu::processInstruction() {
     case 28:
         _ac = pop();
         break;
-    case 29:
+    case 29: // Set system mode, switch stack, push SP and PC, set new SP and PC
         if (_interruptEnabled)
             interrupt(INTERRUPT_HANDLER_ADDRESS);
         break;
-    case 30:
+    case 30: // restore registers and set to user mode
         if (_inSystemMode)
             returnFromInterrupt();
         break;

@@ -390,6 +390,6 @@ void runSuite(int argc, char const *argv[]) {
     cute::makeRunner(lis, argc, argv)(s, "CPUsimTest");
 }
 
-int main(int argc, char const *argv[]) {
-    runSuite(argc, argv);
-}
+//int main(int argc, char const *argv[]) {
+//    runSuite(argc, argv);
+//}

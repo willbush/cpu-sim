@@ -16,18 +16,18 @@ vector<string> parseSourceFile(const string&);
 bool tryPraseLine(const string&, string&);
 void tryRunComputerSim(const vector<string>&, const int);
 
-//int main(int argc, char const *argv[]) {
-//    checkArgCount(argc);
-//    const string filepath = argv[1];
-//    const string timerIntervalStr = argv[2];
-//    const int timerInterval = tryParseTimer(timerIntervalStr);
-//
-//    checkTimerInterval(timerInterval);
-//    checkIfFileExist(filepath);
-//
-//    vector<string> program = parseSourceFile(filepath);
-//    tryRunComputerSim(program, timerInterval);
-//}
+int main(int argc, char const *argv[]) {
+    checkArgCount(argc);
+    const string filepath = argv[1];
+    const string timerIntervalStr = argv[2];
+    const int timerInterval = tryParseTimer(timerIntervalStr);
+
+    checkTimerInterval(timerInterval);
+    checkIfFileExist(filepath);
+
+    vector<string> program = parseSourceFile(filepath);
+    tryRunComputerSim(program, timerInterval);
+}
 
 void checkArgCount(int argc) {
     const int requiredArgs = 3;
