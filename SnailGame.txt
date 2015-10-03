@@ -1,0 +1,408 @@
+// Save the Snail Game:
+// The snail races to a stamper, if the stamper is shut
+// when the snail reaches it, then the snail is going to get
+// squashed. The rate at which the stamper opens and slams
+// is controlled by how often the interrupt handler gets called.
+// the interrupt handler is called based on the timer parameter
+// that you pass to the program. So in order to win you need to
+// find a timer interval that allows the snail to reach the
+// stamper with it open.
+
+// IMPORTANT NOTE: Game animation depends on how printing a char
+// is implemented in the CPU simulator. The buffer needs to be
+// disabled or flushed each time after printing the character.
+
+// Examples of flushing:
+// C++: std::cout << charValue << std::flush;
+// C  : printf("%c", charValue);
+//    : fflush(stdout);
+// Java: System.out.print(charValue);
+//     : System.out.flush();
+
+// Also note: if game animation seems slow try higher interrupt intervals e.g. (> 200)
+// also you can lower the number cycles in the sleep loop routine.
+
+.0    // main routine
+1
+0
+16    // set y to be the number of spaces from the left to the snail
+1
+60
+14    // set x to be the number of spaces from the snail to the right
+
+23
+20    // run main game loop
+
+23
+700   // print game result
+
+1
+10    // newline char
+9
+2
+50    // end execution
+
+// main game loop
+.20
+23
+600   // draw left spaces to the snail
+
+23
+300   // draw snail
+
+23
+500   // sleep
+
+23
+100   // return cursor to left of snail
+
+23
+307   // draw snail stretching
+
+23
+500   // sleep
+
+23
+620   // draw spaces from the snail to the right
+
+23
+110   // draw stamper state open or closed
+
+1
+13    // carriage return
+9
+2
+
+1
+1
+11
+16    // y++
+26    // x-- basically moves the snail to the right once space
+
+15
+22
+20    // if x != 0 jump to beginning of this routine
+24    // end of routine
+
+// return cursor to the left end of the snail
+.100
+1
+13    // carriage return
+9
+2
+23
+600   // space over to the spot of the snail
+24
+
+// draw stamper open or closed based on the value in address 900
+// which the interrupt flips each time it runs.
+.110
+2
+900
+7     // save the state of what's in 900 in case this is the
+901   // last animation and a win/lost is determined.
+21
+120   // draw stamper shut if ac == 0
+22
+150   // draw stamper open if ac != 0
+24
+
+// animate stamper shutting
+.120
+27    // save ac
+
+1
+95    // _ char
+9
+2
+9
+2
+
+1
+124   // | char
+9
+2
+
+1
+95    // _ char
+9
+2
+9
+2
+
+28    // restore ac
+24
+
+// animate stamper opening
+.150
+27    // save ac
+
+1
+95    // _ char
+9
+2
+
+1
+124   // | char
+9
+2
+
+1
+32    // space char
+9
+2
+
+1
+124   // | char
+9
+2
+
+1
+95    // _ char
+9
+2
+
+28    // restore ac
+24
+
+// draw right facing snail _@_Y
+.300
+23
+320   // draw snail body
+1
+89    // Y char
+9
+2
+24    //pop address and return
+
+// draw snail stretching  _@__y
+.307
+23
+320   // draw snail body
+1
+95    // _ char
+9
+2
+1
+121    // y char
+9
+2
+24
+
+// draw snail body
+.320
+1
+95    // _ char
+9
+2
+1
+64    // @ char
+9
+2
+1
+95    // _ char
+9
+2
+24
+
+//sleep routine
+.500
+15
+27    // save x
+1     //load into ac
+5000
+14    //copy ac to x
+26    //x--
+15    //copy x to ac
+22    //jump to address if ac != 0
+505   //address of x--
+28
+14    // restore x
+24    //pop address and return
+
+// insert space n times based on y register
+.600
+15
+27    // save x
+17
+27    // save y
+14    // copy ac to x (i.e. x = y)
+21
+615   // escape early if ac == 0
+1
+32    //load space
+9
+2
+26    //x--
+15    //copy x to ac
+22    //jump to address if ac != 0
+607   //address just after stack push
+28
+16    // restore y
+28
+14    // restore x
+24    // pop address and return
+
+// insert space n times based on x register
+.620
+15
+27    // save x
+1
+32    //load space
+9
+2
+26    //x--
+15    //copy x to ac
+22    //jump to address if ac != 0
+622   //address just after stack push
+28
+14    // restore x
+24    //pop address and return
+
+// print game result
+.700
+1
+10
+9
+2     // print newline char
+
+1
+32
+14
+23
+620   // space over to about the middle
+
+2
+901
+21
+720   // print game over if ac == 0
+22
+800   // print you win if ac != 0
+
+24
+
+// print "You Lose"
+.720
+27    // save ac
+
+23
+820   // print You 
+
+1
+76    // L char
+9
+2
+
+1
+111   // o char
+9
+2
+
+1
+115    // s char
+9
+2
+
+1
+101    // e char
+9
+2
+
+28    // restore ac
+24
+
+// print "You Win"
+.800
+27    // save ac
+
+23
+820   // print You 
+
+1
+87    // W char
+9
+2
+
+1
+105    // i char
+9
+2
+
+1
+110    // n char
+9
+2
+
+28    // restore ac
+24
+
+// print You 
+.820
+1
+89    // Y char
+9
+2
+
+1
+111   // o char
+9
+2
+
+1
+117   // u char
+9
+2
+
+1
+32    // space char
+9
+2
+
+24
+
+// data used as a bool (either 0 or 1) to determine
+// wether the stamper is open (1) or closed(0)
+.900
+1
+
+//interrupt handler routine alternates y = 0 and y = 1
+.1000
+27    // save ac to the stack
+15
+27    // save x to the stack
+17
+27    // save y to the stack
+
+2
+900
+22    //jump to address if ac != 0
+1100
+21    //jump to address if ac == 0
+1200
+
+// set address 900 to 0
+.1100
+1
+0
+7
+900
+20
+1500 // restore registers and interupt return
+
+// set address 900 to 1
+.1200
+1
+1
+7
+900
+20
+1500 // restore registers and interupt return
+
+// restore registers and interupt return
+.1500
+28
+16    // restore y
+28
+14    // restore x
+28    // restore ac
+30    //interrupt return
