@@ -8,10 +8,12 @@ run the following command:
 ```bash
 find . -name '*.cpp' ! -name 'Test.cpp' | xargs g++ -o cpu-sim
 ```
-The command will find all the cpp files except the poorly hacked together unit test file, which won't compile unless you have CUTE test framework library available. 
+The command will find and compile all the cpp files except the poorly hacked together unit test file, which won't compile unless you have CUTE test framework library available. 
 
-An example of how to run the program with the snail game.
+An example of how to run the program with the snail game:
+```bash
 ./cpu-sim snailGame.txt 150
+```
 
 Interrupt timer interval:
 supports numbers on interval [1, 2147483647]
@@ -26,15 +28,15 @@ that you pass to the program. So in order to win you need to
 find a timer interval that allows the snail to reach the
 stamper with it open.
 
+IMPORTANT NOTE: Game animation depends on how printing a char
+is implemented in the CPU simulator. The buffer needs to be
+disabled or flushed each time after printing the character.
+
 #### Listing of my Files
 
 snailGame.txt - Save the Snail Game. Please note the comments on the top of the
                 source file if the game does not animate in your own CPU sim
                 implementation.
-
-IMPORTANT NOTE: Game animation depends on how printing a char
-is implemented in the CPU simulator. The buffer needs to be
-disabled or flushed each time after printing the character.
 
 Source files:
 Main.cpp - contains the main function. Does some parameter checking and
