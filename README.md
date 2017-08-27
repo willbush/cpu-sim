@@ -16,9 +16,9 @@
 
 <!-- markdown-toc end -->
 
-[snail-lose](gifs/snail-lose.gif)
+![snail-lose](gifs/snail-lose.gif)
 
-[snail-win](gifs/snail-win.gif)
+![snail-win](gifs/snail-win.gif)
 
 This is a academic project I did a while back, it simulates a simple computer
 system consisting of a CPU and memory. The CPU and memory are simulated in
